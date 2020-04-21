@@ -26,22 +26,14 @@ class LampWidgetState extends State<LampWidget> {
     return colorIntensity;
   }
 
-  Color getWidgetColor() {
-    if (widget._lamp.isTurnedOn()) {
-      return Colors.amberAccent[100];
-    } else {
-      return Colors.white;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: EdgeInsets.all(15),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(25.0),
         ),
-        margin: EdgeInsets.fromLTRB(10, 0, 10, 20),
-        color: getWidgetColor(),
+        color: Colors.white,
         child: Container(
             child: Stack(
           children: <Widget>[
@@ -60,12 +52,11 @@ class LampWidgetState extends State<LampWidget> {
                 child: RotatedBox(
                     quarterTurns: 3,
                     child: CustomSwitch(
-//                  activeColor: Colors.white,
                       value: widget._lamp.isTurnedOn(),
                       onChanged: (bool value) {
                         widget._lamp.setTurnedOn(value);
                         widget._sendMqttMessage();
-                        setState(() {});
+                        this.setState(() {});
                       },
                     ))),
             Positioned(

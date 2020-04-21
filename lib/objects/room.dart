@@ -6,12 +6,30 @@ class Room {
 
   Room(this._name, this._lights);
 
-  getName() {
+  String getName() {
     return this._name;
   }
 
-  getLights() {
+  List<Light> getLights() {
     return this._lights;
+  }
+
+  bool lightOn() {
+    bool lightOn = false;
+    for (Light light in this._lights) {
+      if (light.getBrightness() > 0) {
+        lightOn = true;
+        break;
+      }
+    }
+    return lightOn;
+  }
+
+  setLightState(double brightness, bool turnedOn) {
+    for (Light light in this._lights) {
+      light.setTurnedOn(turnedOn);
+      light.setBrightness(brightness);
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -26,5 +44,10 @@ class Room {
     }
     map.putIfAbsent(this._name, () => brightnesses);
     return map;
+  }
+
+  double getAverageBrightness() {
+    return this._lights.map((e) => e.getBrightness()).reduce((a, b) => a + b) /
+        this._lights.length;
   }
 }

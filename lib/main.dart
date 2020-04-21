@@ -7,7 +7,6 @@ import 'package:light_app/ui/round_slider_track_shape.dart';
 import 'package:light_app/util/secret_loader.dart';
 
 import 'mqtt/mqtt_wrapper.dart';
-import 'util/secret.dart';
 
 List<Light> _lamps = [
   Light("Light 1"),
@@ -21,9 +20,6 @@ List<Light> _lamps = [
 ];
 List<Room> lights = [
   Room("Tuinhuis", _lamps),
-  Room("Woonkamer", [Light("Light 1"), Light("Light 1")]),
-  Room("Keuken", [Light("Light 1")]),
-  Room("Slaapkamer", [Light("Light 1"), Light("Light 1"), Light("Light 1")])
 ];
 
 void main() => runApp(MyApp());
@@ -42,12 +38,13 @@ class MyAppState extends State<MyApp> {
     setup();
   }
 
-  void setup() async {
-    Secret secret = await SecretLoader(secretPath: "secrets.json").load();
-    mqttClientWrapper = MQTTClientWrapper(secret.mqttHost, 'phone_client', 1883,
-        () => whatToDoAfterConnect(), (message) => gotMessage(message),
-        username: secret.mqttUsername, password: secret.mqttPassword);
-    mqttClientWrapper.prepareMqttClient();
+  void setup() {
+    SecretLoader(secretPath: "secrets.json").load().then((secret) {
+      mqttClientWrapper = MQTTClientWrapper(secret.mqttHost, 'phone_client',
+          1883, () => whatToDoAfterConnect(), (message) => gotMessage(message),
+          username: secret.mqttUsername, password: secret.mqttPassword);
+      mqttClientWrapper.prepareMqttClient();
+    });
   }
 
   gotMessage(String message) {
@@ -60,12 +57,14 @@ class MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     MainControlPage mainControlPage =
         MainControlPage(lights, mqttClientWrapper);
-    OverviewPage overviewPage = OverviewPage(lights, mqttClientWrapper);
 
     return MaterialApp(
       theme: ThemeData(
+          primaryColor: Colors.amber,
+          accentColor: Colors.amber[200],
           sliderTheme: Theme.of(context).sliderTheme.copyWith(
                 trackHeight: 22.0,
+                thumbShape: RoundSliderThumbShape(enabledThumbRadius: 11),
                 trackShape: RoundSliderTrackShape(),
                 activeTrackColor: Colors.green,
               ),
@@ -73,7 +72,6 @@ class MyAppState extends State<MyApp> {
       home: mainControlPage,
       routes: <String, WidgetBuilder>{
         '/main': (BuildContext context) => mainControlPage,
-        '/lights': (BuildContext context) => overviewPage,
       },
     );
   }

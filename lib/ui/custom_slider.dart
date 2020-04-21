@@ -6,7 +6,7 @@ class CustomSlider extends StatelessWidget {
   double percentage;
   Color positiveColor;
   Color negetiveColor;
- 
+
   CustomSlider({this.percentage, this.positiveColor, this.negetiveColor});
  
   @override

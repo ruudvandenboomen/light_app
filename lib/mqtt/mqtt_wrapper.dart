@@ -106,7 +106,9 @@ class MQTTClientWrapper {
       {String topic = MQTTClientWrapper.topic}) {
     final MqttClientPayloadBuilder builder = MqttClientPayloadBuilder();
     builder.addString(message);
-
+    if (this.connectionState == MqttCurrentConnectionState.DISCONNECTED) {
+      this._connectClient();
+    }
     print('MQTTClientWrapper::Publishing message $message to topic');
     client.publishMessage(topic, MqttQos.exactlyOnce, builder.payload);
   }

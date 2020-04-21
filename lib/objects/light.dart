@@ -1,7 +1,7 @@
 class Light {
   String _name;
   bool _turnedOn = false;
-  double _brightness = 0;
+  double _brightness = 0.0;
 
   Light(this._name);
 

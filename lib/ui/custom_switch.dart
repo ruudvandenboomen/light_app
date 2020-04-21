@@ -48,7 +48,7 @@ class _CustomSwitchState extends State<CustomSwitch>
             height: 26.0,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(24.0),
-                color: widget.value ? Colors.white : Colors.grey[200]),
+                color: Colors.grey[200]),
             child: Padding(
               padding: const EdgeInsets.only(
                   top: 2.0, bottom: 2.0, right: 4.0, left: 4.0),
@@ -60,7 +60,8 @@ class _CustomSwitchState extends State<CustomSwitch>
                   height: 18.0,
                   decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: widget.value ? Colors.amber[200] : Colors.grey[500]),
+                      color:
+                          widget.value ? Colors.amber[200] : Colors.grey[500]),
                 ),
               ),
             ),

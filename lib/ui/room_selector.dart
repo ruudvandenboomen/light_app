@@ -25,18 +25,18 @@ class RoomSelectorWidgetState extends State<RoomSelectorWidget> {
             elevation: isSelected ? 2 : 1,
             color: Colors.white,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(40.0),
-            ),
+                borderRadius: BorderRadius.circular(40.0)),
             child: Stack(
               children: <Widget>[
                 Container(
-                    width: 160,
+                    width: 140,
                     alignment: Alignment.center,
-                    padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+                    padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                     child: Text(
                       widget._room.getName(),
                       style: TextStyle(
                           fontSize: 18,
+                          fontWeight: FontWeight.w500,
                           color: isSelected ? Colors.black : Colors.grey),
                     ))
               ],
