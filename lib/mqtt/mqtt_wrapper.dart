@@ -12,7 +12,9 @@ enum MqttCurrentConnectionState {
 enum MqttSubscriptionState { IDLE, SUBSCRIBED }
 
 class MQTTClientWrapper {
-  static const String topic = "home/summerhouse/lights";
+  static const String lightTopic = "home/summerhouse/lights";
+  static const String temperatureTopic = "home/summerhouse/temperature";
+
   final String _server;
   final String _clientId;
   final int _port;
@@ -25,7 +27,7 @@ class MQTTClientWrapper {
   MqttSubscriptionState subscriptionState = MqttSubscriptionState.IDLE;
 
   VoidCallback onConnectedCallback;
-  Function(String) onMessageReceived;
+  Function(String, String) onMessageReceived;
 
   MQTTClientWrapper(this._server, this._clientId, this._port,
       this.onConnectedCallback, this.onMessageReceived,
@@ -34,7 +36,8 @@ class MQTTClientWrapper {
   void prepareMqttClient() async {
     _setupMqttClient();
     await _connectClient();
-    _subscribeToTopic(MQTTClientWrapper.topic);
+    _subscribeToTopic(MQTTClientWrapper.lightTopic);
+    _subscribeToTopic(MQTTClientWrapper.temperatureTopic);
   }
 
   void _setupMqttClient() {
@@ -73,10 +76,10 @@ class MQTTClientWrapper {
     client.subscribe(topicName, MqttQos.atMostOnce);
     client.updates.listen((List<MqttReceivedMessage<MqttMessage>> c) {
       final MqttPublishMessage recMess = c[0].payload;
-      final String LocationJson =
+      final String locationJson =
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
-      print("MQTTClientWrapper::GOT A  MESSAGE $LocationJson");
-      onMessageReceived(LocationJson);
+      print("MQTTClientWrapper::GOT A  MESSAGE $locationJson");
+      onMessageReceived(locationJson, topicName);
     });
   }
 
@@ -103,7 +106,7 @@ class MQTTClientWrapper {
   }
 
   void publishMessage(String message,
-      {String topic = MQTTClientWrapper.topic}) {
+      {String topic = MQTTClientWrapper.lightTopic}) {
     final MqttClientPayloadBuilder builder = MqttClientPayloadBuilder();
     builder.addString(message);
     if (this.connectionState == MqttCurrentConnectionState.DISCONNECTED) {

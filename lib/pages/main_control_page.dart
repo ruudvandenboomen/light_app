@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:light_app/mqtt/mqtt_wrapper.dart';
 import 'package:light_app/objects/room.dart';
+import 'package:light_app/objects/temperature.dart';
 import 'package:light_app/ui/room_selector.dart';
 import 'package:light_app/ui/round_slider_track_shape.dart';
 
@@ -13,8 +14,9 @@ import 'overview_page.dart';
 class MainControlPage extends StatefulWidget {
   final List<Room> _rooms;
   final MQTTClientWrapper _mqttClientWrapper;
+  final Temperature _currentTemp;
 
-  MainControlPage(this._rooms, this._mqttClientWrapper);
+  MainControlPage(this._rooms, this._mqttClientWrapper, this._currentTemp);
 
   @override
   State<StatefulWidget> createState() => MainControlPageState();
@@ -31,7 +33,7 @@ class MainControlPageState extends State<MainControlPage> {
   }
 
   setBrightness(double brightness) {
-    currentRoom.getLights().forEach((lamp) => lamp.setBrightness(brightness));
+    currentRoom.lights.forEach((lamp) => lamp.brightness = brightness);
   }
 
   void changeCurrentRoom(Room room) {
@@ -85,7 +87,7 @@ class MainControlPageState extends State<MainControlPage> {
                     Container(
                         padding: EdgeInsets.all(15),
                         child: Text(
-                          currentRoom.getName().toUpperCase(),
+                          currentRoom.name.toUpperCase(),
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 52,
@@ -281,10 +283,34 @@ class MainControlPageState extends State<MainControlPage> {
                 Container(
                   height: 20,
                 ),
-
-//          Expanded(
-//              child: MainControlWidget(currentRoom, sliderValue,
-//                  changeSliderValue, widget._mqttClientWrapper.publishMessage))
+                Container(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    child: Card(
+                        child: ExpansionTile(
+                            title: Row(
+                              children: <Widget>[
+                                Icon(
+                                  Icons.wb_sunny,
+                                  color: Colors.amber[200],
+                                ),
+                                Text(
+                                    widget._currentTemp != null
+                                        ? "Temperature: ${widget._currentTemp.temperature.toStringAsFixed(0)}°C"
+                                        : "Temperature",
+                                    style: TextStyle(fontSize: 20))
+                              ],
+                            ),
+                            children: <Widget>[
+                          ListTile(
+                              title: Text(
+                                  widget._currentTemp != null
+                                      ? "Humidity: ${widget._currentTemp.humidity.toStringAsFixed(0)}°C"
+                                      : "Humidity",
+                                  style: TextStyle(fontSize: 18)))
+                        ]))),
+                Container(
+                  height: 20,
+                )
               ],
             ),
           ),

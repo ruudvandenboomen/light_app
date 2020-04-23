@@ -1,23 +1,15 @@
 import 'light.dart';
 
 class Room {
-  String _name;
-  List<Light> _lights;
+  String name;
+  List<Light> lights;
 
-  Room(this._name, this._lights);
-
-  String getName() {
-    return this._name;
-  }
-
-  List<Light> getLights() {
-    return this._lights;
-  }
+  Room(this.name, this.lights);
 
   bool lightOn() {
     bool lightOn = false;
-    for (Light light in this._lights) {
-      if (light.getBrightness() > 0) {
+    for (Light light in this.lights) {
+      if (light.brightness > 0) {
         lightOn = true;
         break;
       }
@@ -26,28 +18,29 @@ class Room {
   }
 
   setLightState(double brightness, bool turnedOn) {
-    for (Light light in this._lights) {
-      light.setTurnedOn(turnedOn);
-      light.setBrightness(brightness);
+    for (Light light in this.lights) {
+      light.turnedOn = turnedOn;
+      light.brightness = brightness;
     }
+  }
+
+  double getAverageBrightness() {
+    return this.lights.map((e) => e.brightness).reduce((a, b) => a + b) /
+        this.lights.length;
   }
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = Map();
     List<double> brightnesses = List();
-    for (var i = 0; i < _lights.length; i++) {
-      Light light = _lights[i];
-      if (light.isTurnedOn())
-        brightnesses.add(1 - _lights[i].getBrightness());
+    for (var i = 0; i < lights.length; i++) {
+      Light light = lights[i];
+      if (light.turnedOn)
+        brightnesses.add(1 - lights[i].brightness);
       else
         brightnesses.add(1.0);
     }
-    map.putIfAbsent(this._name, () => brightnesses);
+    map.putIfAbsent(this.name, () => brightnesses);
     return map;
   }
 
-  double getAverageBrightness() {
-    return this._lights.map((e) => e.getBrightness()).reduce((a, b) => a + b) /
-        this._lights.length;
-  }
 }

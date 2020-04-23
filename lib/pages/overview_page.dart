@@ -53,7 +53,7 @@ class OverviewPageState extends State<OverviewPage> {
                   removeTop: true,
                   child: GridView.builder(
                     shrinkWrap: true,
-                    itemCount: widget._room.getLights().length,
+                    itemCount: widget._room.lights.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: (MediaQuery.of(context).orientation ==
                                 Orientation.portrait)
@@ -66,7 +66,7 @@ class OverviewPageState extends State<OverviewPage> {
                           : 3;
                       return Center(
                           child: LampWidget(
-                              widget._room.getLights()[index], () => update()));
+                              widget._room.lights[index], () => update()));
                     },
                   ),
                 ),

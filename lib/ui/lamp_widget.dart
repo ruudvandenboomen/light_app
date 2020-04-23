@@ -17,7 +17,7 @@ class LampWidget extends StatefulWidget {
 class LampWidgetState extends State<LampWidget> {
   int getSliderColor() {
     var colorIntensity =
-        int.parse((widget._lamp.getBrightness() * 10).toStringAsFixed(0)) * 100;
+        int.parse((widget._lamp.brightness * 10).toStringAsFixed(0)) * 100;
     if (colorIntensity < 100) {
       return 100;
     } else if (colorIntensity > 900) {
@@ -40,7 +40,7 @@ class LampWidgetState extends State<LampWidget> {
             Positioned(
               left: 15,
               top: 40,
-              child: Text(widget._lamp.getName(),
+              child: Text(widget._lamp.name,
                   style: TextStyle(
                       color: Colors.black,
                       fontSize: 24.0,
@@ -52,9 +52,9 @@ class LampWidgetState extends State<LampWidget> {
                 child: RotatedBox(
                     quarterTurns: 3,
                     child: CustomSwitch(
-                      value: widget._lamp.isTurnedOn(),
+                      value: widget._lamp.turnedOn,
                       onChanged: (bool value) {
-                        widget._lamp.setTurnedOn(value);
+                        widget._lamp.turnedOn = value;
                         widget._sendMqttMessage();
                         this.setState(() {});
                       },
@@ -65,7 +65,7 @@ class LampWidgetState extends State<LampWidget> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(widget._lamp.isTurnedOn() ? "AAN" : "UIT",
+                  Text(widget._lamp.turnedOn ? "AAN" : "UIT",
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 14.0,
@@ -73,7 +73,7 @@ class LampWidgetState extends State<LampWidget> {
                   Row(
                     children: <Widget>[
                       Text(
-                          (widget._lamp.getBrightness() * 100)
+                          (widget._lamp.brightness * 100)
                               .toStringAsFixed(0),
                           style: TextStyle(
                               color: Colors.black,
@@ -99,13 +99,13 @@ class LampWidgetState extends State<LampWidget> {
                   min: 0.0,
                   max: 1.0,
                   onChangeEnd: (brightness) {
-                    if (widget._lamp.isTurnedOn()) {
+                    if (widget._lamp.turnedOn) {
                       widget._sendMqttMessage();
                     }
                   },
-                  value: widget._lamp.getBrightness(),
+                  value: widget._lamp.brightness,
                   onChanged: (brightness) {
-                    widget._lamp.setBrightness(brightness);
+                    widget._lamp.brightness = brightness;
                     setState(() {});
                   },
                 ))

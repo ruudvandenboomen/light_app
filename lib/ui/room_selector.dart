@@ -33,7 +33,7 @@ class RoomSelectorWidgetState extends State<RoomSelectorWidget> {
                     alignment: Alignment.center,
                     padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                     child: Text(
-                      widget._room.getName(),
+                      widget._room.name,
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
