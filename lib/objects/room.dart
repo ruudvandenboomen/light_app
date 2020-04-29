@@ -34,8 +34,10 @@ class Room {
     List<double> brightnesses = List();
     for (var i = 0; i < lights.length; i++) {
       Light light = lights[i];
+      //TODO: change that 1 is of and 0 is on when lights won't work reversed anymore
       if (light.turnedOn)
-        brightnesses.add(1 - lights[i].brightness);
+        brightnesses
+            .add(double.parse((1.0 - lights[i].brightness).toStringAsFixed(2)));
       else
         brightnesses.add(1.0);
     }
@@ -43,4 +45,13 @@ class Room {
     return map;
   }
 
+  fromJson(Map<String, dynamic> json) {
+    List<dynamic> brightnesses = json[name];
+    for (var i = 0; i < lights.length; i++) {
+      double brightness = brightnesses[i].toDouble();
+      //TODO: change 1 to 0 when lights won't work reversed anymore
+      lights[i].brightness = 1.0 - brightness;
+      lights[i].turnedOn = brightness < 1;
+    }
+  }
 }

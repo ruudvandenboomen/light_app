@@ -30,6 +30,9 @@ class OverviewPageState extends State<OverviewPage> {
 
   @override
   Widget build(BuildContext context) {
+    var crossAxisCount =
+        MediaQuery.of(context).orientation == Orientation.portrait ? 2 : 3;
+    var widgetHeight = 220;
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -55,15 +58,12 @@ class OverviewPageState extends State<OverviewPage> {
                     shrinkWrap: true,
                     itemCount: widget._room.lights.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: (MediaQuery.of(context).orientation ==
-                                Orientation.portrait)
-                            ? 2
-                            : 3),
+                      crossAxisCount: crossAxisCount,
+                      childAspectRatio:
+                          ((MediaQuery.of(context).size.width / crossAxisCount) /
+                              widgetHeight),
+                    ),
                     itemBuilder: (BuildContext context, int index) {
-                      int divideBy = MediaQuery.of(context).orientation ==
-                              Orientation.portrait
-                          ? 2
-                          : 3;
                       return Center(
                           child: LampWidget(
                               widget._room.lights[index], () => update()));

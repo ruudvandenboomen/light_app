@@ -79,7 +79,7 @@ class MQTTClientWrapper {
       final String locationJson =
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
       print("MQTTClientWrapper::GOT A  MESSAGE $locationJson");
-      onMessageReceived(locationJson, topicName);
+      onMessageReceived(locationJson, c[0].topic);
     });
   }
 
@@ -113,6 +113,6 @@ class MQTTClientWrapper {
       this._connectClient();
     }
     print('MQTTClientWrapper::Publishing message $message to topic');
-    client.publishMessage(topic, MqttQos.exactlyOnce, builder.payload);
+    client.publishMessage(topic, MqttQos.exactlyOnce, builder.payload, retain: true);
   }
 }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:light_app/mqtt/mqtt_wrapper.dart';
 import 'package:light_app/objects/room.dart';
 import 'package:light_app/objects/temperature.dart';
@@ -15,6 +16,7 @@ class MainControlPage extends StatefulWidget {
   final List<Room> _rooms;
   final MQTTClientWrapper _mqttClientWrapper;
   final Temperature _currentTemp;
+  bool sliderChanged = false;
 
   MainControlPage(this._rooms, this._mqttClientWrapper, this._currentTemp);
 
@@ -23,13 +25,19 @@ class MainControlPage extends StatefulWidget {
 }
 
 class MainControlPageState extends State<MainControlPage> {
-  Room currentRoom;
-  double sliderValue = 0.0;
+  static Room currentRoom;
+  double sliderValue =
+      currentRoom != null ? currentRoom.getAverageBrightness() : 0.0;
+  Temperature currentTemp;
+  bool sliderChanged = false;
 
   @override
   void initState() {
     super.initState();
     currentRoom = widget._rooms[0];
+    sliderValue = currentRoom.getAverageBrightness();
+    print("sliderValue: $sliderValue");
+    setState(() {});
   }
 
   setBrightness(double brightness) {
@@ -37,13 +45,12 @@ class MainControlPageState extends State<MainControlPage> {
   }
 
   void changeCurrentRoom(Room room) {
-    this.currentRoom = room;
+    currentRoom = room;
     setState(() {});
   }
 
-  void changeSliderValue(double value) {
-    this.sliderValue = value;
-    setState(() {});
+  double getSliderValue() {
+    return sliderChanged ? sliderValue : currentRoom.getAverageBrightness();
   }
 
   @override
@@ -156,29 +163,61 @@ class MainControlPageState extends State<MainControlPage> {
                                       fontSize: 50,
                                       fontWeight: FontWeight.w900,
                                       color: currentRoom.lightOn()
-                                          ? Colors.amber[200]
+                                          ? Theme.of(context).accentColor
                                           : Colors.grey,
                                     )),
                               ],
                             ))),
                         Flexible(
-                            flex: 1,
-                            child: Card(
-                                child: Row(
+                          flex: 1,
+                          child: Card(
+                            child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                FaIcon(FontAwesomeIcons.solidSun,
-                                    color: Colors.amber[200]),
-                                Container(
-                                  width: 5,
+                                sliderValue.toStringAsFixed(2) !=
+                                            currentRoom
+                                                .getAverageBrightness()
+                                                .toStringAsFixed(2) &&
+                                        sliderChanged
+                                    ? Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Text("Currently ",
+                                              style: TextStyle(fontSize: 14)),
+                                          Text(
+                                              (currentRoom.getAverageBrightness() *
+                                                      100)
+                                                  .toStringAsFixed(0),
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold)),
+                                          Text("%",
+                                              style: TextStyle(fontSize: 14))
+                                        ],
+                                      )
+                                    : Container(),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    FaIcon(FontAwesomeIcons.solidSun,
+                                        color: Theme.of(context).accentColor),
+                                    Container(
+                                      width: 5,
+                                    ),
+                                    Text(
+                                        (getSliderValue() * 100)
+                                            .toStringAsFixed(0),
+                                        style: TextStyle(
+                                            fontSize: 50,
+                                            fontWeight: FontWeight.bold)),
+                                    Text("%", style: TextStyle(fontSize: 24))
+                                  ],
                                 ),
-                                Text((sliderValue * 100).toStringAsFixed(0),
-                                    style: TextStyle(
-                                        fontSize: 50,
-                                        fontWeight: FontWeight.bold)),
-                                Text("%", style: TextStyle(fontSize: 24))
                               ],
-                            )))
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -200,14 +239,17 @@ class MainControlPageState extends State<MainControlPage> {
                           child: Slider(
                             divisions: 10,
                             inactiveColor: Colors.grey[100],
-                            activeColor: Colors.amber[100],
+                            activeColor: Theme.of(context).accentColor,
                             min: 0.0,
                             max: 1.0,
-                            onChangeEnd: (brightness) =>
-                                sliderValue = brightness,
-                            value: sliderValue,
+                            onChangeEnd: (brightness) {
+                              sliderValue = brightness;
+                              sliderChanged = true;
+                            },
+                            value: getSliderValue(),
                             onChanged: (brightness) {
                               sliderValue = brightness;
+                              sliderChanged = true;
                               setState(() {});
                             },
                           ),
@@ -216,7 +258,7 @@ class MainControlPageState extends State<MainControlPage> {
                           children: <Widget>[
                             Expanded(
                                 child: RaisedButton(
-                                    color: Colors.amber[200],
+                                    color: Theme.of(context).accentColor,
                                     padding: EdgeInsets.symmetric(vertical: 20),
                                     child: Text("TURN ON"),
                                     onPressed: () {
@@ -252,30 +294,34 @@ class MainControlPageState extends State<MainControlPage> {
                   child: GestureDetector(
                     onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(
+                        CupertinoPageRoute(
                             builder: (context) => OverviewPage(
                                 currentRoom, widget._mqttClientWrapper))),
                     child: Card(
                         child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.all(15),
+                        Container(
+                          height: 58,
+                          padding: EdgeInsets.only(left: 20),
                           child: Row(
                             children: <Widget>[
                               FaIcon(FontAwesomeIcons.slidersH,
-                                  color: Colors.amber[200], size: 20),
-                              Container(width: 5),
+                                  color: Theme.of(context).accentColor,
+                                  size: 24),
+                              Container(width: 15),
                               Text("Tune Lights",
                                   style: TextStyle(fontSize: 20))
                             ],
                           ),
                         ),
-                        IconButton(
-                          color: Colors.grey,
-                          icon: Icon(Icons.navigate_next),
-                          onPressed: () {},
-                        )
+                        Padding(
+                            padding: EdgeInsets.only(right: 14),
+                            child: Icon(
+                              Icons.keyboard_arrow_right,
+                              color: Colors.black,
+                              size: 24,
+                            ))
                       ],
                     )),
                   ),
@@ -283,31 +329,47 @@ class MainControlPageState extends State<MainControlPage> {
                 Container(
                   height: 20,
                 ),
-                Container(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    child: Card(
-                        child: ExpansionTile(
-                            title: Row(
-                              children: <Widget>[
-                                Icon(
-                                  Icons.wb_sunny,
-                                  color: Colors.amber[200],
+                widget._currentTemp != null
+                    ? Container(
+                        padding: EdgeInsets.symmetric(horizontal: 15),
+                        child: Card(
+                          child: Theme(
+                            data: ThemeData(
+                                dividerColor: Colors.transparent,
+                                accentColor: Colors.black,
+                                unselectedWidgetColor: Colors.black),
+                            child: ExpansionTile(
+                                title: Row(
+                                  children: <Widget>[
+                                    Icon(
+                                      Icons.wb_sunny,
+                                      color: Theme.of(context).accentColor,
+                                      size: 32,
+                                    ),
+                                    Container(width: 15),
+                                    Text(
+                                        "${widget._currentTemp.temperature.toStringAsFixed(0)}°C ",
+                                        style: TextStyle(fontSize: 32)),
+                                    Spacer(),
+                                    Text(DateFormat('kk:mm \ndd-MM')
+                                        .format(widget._currentTemp.measured))
+                                  ],
                                 ),
-                                Text(
-                                    widget._currentTemp != null
-                                        ? "Temperature: ${widget._currentTemp.temperature.toStringAsFixed(0)}°C"
-                                        : "Temperature",
-                                    style: TextStyle(fontSize: 20))
-                              ],
-                            ),
-                            children: <Widget>[
-                          ListTile(
-                              title: Text(
-                                  widget._currentTemp != null
-                                      ? "Humidity: ${widget._currentTemp.humidity.toStringAsFixed(0)}°C"
-                                      : "Humidity",
-                                  style: TextStyle(fontSize: 18)))
-                        ]))),
+                                children: <Widget>[
+                                  ListTile(
+                                      title: Text(
+                                    "Humidity: ${widget._currentTemp.humidity.toStringAsFixed(0)}%",
+                                    style: TextStyle(fontSize: 18),
+                                  )),
+                                  ListTile(
+                                      title: Text(
+                                          "Pressure: ${widget._currentTemp.pressure.toStringAsFixed(0)} hPa",
+                                          style: TextStyle(fontSize: 18)))
+                                ]),
+                          ),
+                        ),
+                      )
+                    : Container(),
                 Container(
                   height: 20,
                 )
@@ -319,6 +381,3 @@ class MainControlPageState extends State<MainControlPage> {
     );
   }
 }
-
-//onPressed: () {
-//Navigator.pushNamed(context, "/lights");

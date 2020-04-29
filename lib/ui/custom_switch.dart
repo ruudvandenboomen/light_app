@@ -61,7 +61,7 @@ class _CustomSwitchState extends State<CustomSwitch>
                   decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color:
-                          widget.value ? Colors.amber[200] : Colors.grey[500]),
+                          widget.value ? Theme.of(context).accentColor : Colors.grey[500]),
                 ),
               ),
             ),

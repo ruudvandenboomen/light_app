@@ -10,20 +10,6 @@ import 'package:light_app/util/secret_loader.dart';
 import 'mqtt/mqtt_wrapper.dart';
 import 'objects/temperature.dart';
 
-List<Light> _lamps = [
-  Light("Light 1"),
-  Light("Light 2"),
-  Light("Light 3"),
-  Light("Light 4"),
-  Light("Light 5"),
-  Light("Light 6"),
-  Light("Light 7"),
-  Light("Light 8"),
-];
-List<Room> lights = [
-  Room("Tuinhuis", _lamps),
-];
-
 void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
@@ -32,6 +18,20 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
+  static List<Light> _lamps = [
+    Light("Light 1"),
+    Light("Light 2"),
+    Light("Light 3"),
+    Light("Light 4"),
+    Light("Light 5"),
+    Light("Light 6"),
+    Light("Light 7"),
+    Light("Light 8"),
+  ];
+  List<Room> rooms = [
+    Room("Tuinhuis", _lamps),
+  ];
+
   MQTTClientWrapper mqttClientWrapper;
   Temperature currentTemp;
 
@@ -60,8 +60,10 @@ class MyAppState extends State<MyApp> {
     if (topic == MQTTClientWrapper.temperatureTopic) {
       this.currentTemp = Temperature.fromJson(jsonDecode(message));
       setState(() {});
+    } else if (topic == MQTTClientWrapper.lightTopic) {
+      rooms[0].fromJson(jsonDecode(message));
+      setState(() {});
     }
-    print(message);
   }
 
   whatToDoAfterConnect() {}
@@ -69,7 +71,7 @@ class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     MainControlPage mainControlPage =
-        MainControlPage(lights, mqttClientWrapper, currentTemp);
+        MainControlPage(rooms, mqttClientWrapper, currentTemp);
 
     return MaterialApp(
       theme: ThemeData(
