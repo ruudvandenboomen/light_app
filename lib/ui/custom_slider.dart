@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class CustomSlider extends StatelessWidget {
-  double totalWidth = 200.0;
-  double percentage;
-  Color positiveColor;
-  Color negetiveColor;
+  final double totalWidth = 200.0;
+  final double percentage;
+  final Color positiveColor;
+  final Color negativeColor;
 
-  CustomSlider({this.percentage, this.positiveColor, this.negetiveColor});
- 
+  CustomSlider({this.percentage, this.positiveColor, this.negativeColor});
+
   @override
   Widget build(BuildContext context) {
     print((percentage / 100) * totalWidth);
@@ -17,7 +17,7 @@ class CustomSlider extends StatelessWidget {
       width: totalWidth + 4.0,
       height: 30.0,
       decoration: BoxDecoration(
-          color: negetiveColor,
+          color: negativeColor,
           border: Border.all(color: Colors.black, width: 2.0)),
       child: Row(
         mainAxisSize: MainAxisSize.max,

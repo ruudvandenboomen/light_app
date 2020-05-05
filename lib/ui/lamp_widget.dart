@@ -31,7 +31,6 @@ class LampWidgetState extends State<LampWidget> {
     return Container(
         height: 450,
         child: Card(
-            margin: EdgeInsets.all(15),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(25.0),
             ),

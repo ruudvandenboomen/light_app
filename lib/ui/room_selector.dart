@@ -3,9 +3,9 @@ import 'package:flutter/widgets.dart';
 import 'package:light_app/objects/room.dart';
 
 class RoomSelectorWidget extends StatefulWidget {
-  Room _room;
-  Room _currentRoom;
-  Function _changeCurrentRoom;
+  final Room _room;
+  final Room _currentRoom;
+  final Function _changeCurrentRoom;
 
   RoomSelectorWidget(this._room, this._currentRoom, this._changeCurrentRoom);
 

@@ -16,7 +16,6 @@ class MainControlPage extends StatefulWidget {
   final List<Room> _rooms;
   final MQTTClientWrapper _mqttClientWrapper;
   final Temperature _currentTemp;
-  bool sliderChanged = false;
 
   MainControlPage(this._rooms, this._mqttClientWrapper, this._currentTemp);
 
@@ -36,7 +35,6 @@ class MainControlPageState extends State<MainControlPage> {
     super.initState();
     currentRoom = widget._rooms[0];
     sliderValue = currentRoom.getAverageBrightness();
-    print("sliderValue: $sliderValue");
     setState(() {});
   }
 
@@ -71,14 +69,13 @@ class MainControlPageState extends State<MainControlPage> {
         children: <Widget>[
           Column(
             children: <Widget>[
-              Flexible(
-                flex: 1,
+              Container(
+                height: 200,
                 child: Container(
                   color: Colors.amber[300],
                 ),
               ),
               Flexible(
-                flex: 3,
                 child: Container(
                   color: Colors.grey[100],
                 ),
@@ -92,6 +89,7 @@ class MainControlPageState extends State<MainControlPage> {
                 Column(
                   children: <Widget>[
                     Container(
+                        height: 80,
                         padding: EdgeInsets.all(15),
                         child: Text(
                           currentRoom.name.toUpperCase(),
@@ -174,29 +172,33 @@ class MainControlPageState extends State<MainControlPage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                sliderValue.toStringAsFixed(2) !=
-                                            currentRoom
-                                                .getAverageBrightness()
-                                                .toStringAsFixed(2) &&
-                                        sliderChanged
-                                    ? Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Text("Currently ",
-                                              style: TextStyle(fontSize: 14)),
-                                          Text(
-                                              (currentRoom.getAverageBrightness() *
-                                                      100)
-                                                  .toStringAsFixed(0),
-                                              style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold)),
-                                          Text("%",
-                                              style: TextStyle(fontSize: 14))
-                                        ],
-                                      )
-                                    : Container(),
+                                AnimatedSwitcher(
+                                  duration: Duration(milliseconds: 500),
+                                  child: sliderValue.toStringAsFixed(2) !=
+                                              currentRoom
+                                                  .getAverageBrightness()
+                                                  .toStringAsFixed(2) &&
+                                          sliderChanged
+                                      ? Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Text("Currently ",
+                                                style: TextStyle(fontSize: 14)),
+                                            Text(
+                                                (currentRoom.getAverageBrightness() *
+                                                        100)
+                                                    .toStringAsFixed(0),
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                            Text("%",
+                                                style: TextStyle(fontSize: 14))
+                                          ],
+                                        )
+                                      : SizedBox.shrink(),
+                                ),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[

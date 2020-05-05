@@ -17,7 +17,7 @@ class MyApp extends StatefulWidget {
   createState() => MyAppState();
 }
 
-class MyAppState extends State<MyApp> {
+class MyAppState extends State<MyApp> with WidgetsBindingObserver {
   static List<Light> _lamps = [
     Light("Light 1"),
     Light("Light 2"),
@@ -39,6 +39,22 @@ class MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     setup();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    setState(() {
+      if (state == AppLifecycleState.resumed &&
+          mqttClientWrapper.connectionState !=
+              MqttCurrentConnectionState.CONNECTED) setup();
+    });
   }
 
   void setup() {
@@ -84,6 +100,7 @@ class MyAppState extends State<MyApp> {
                 activeTrackColor: Colors.green,
               ),
           iconTheme: IconThemeData(color: Colors.white, size: 28)),
+      debugShowCheckedModeBanner: false,
       home: mainControlPage,
       routes: <String, WidgetBuilder>{
         '/main': (BuildContext context) => mainControlPage,

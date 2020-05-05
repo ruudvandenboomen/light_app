@@ -30,9 +30,11 @@ class OverviewPageState extends State<OverviewPage> {
 
   @override
   Widget build(BuildContext context) {
+    var crossAxisCountLandscape = MediaQuery.of(context).size.width > 800 ? 4 : 3;
     var crossAxisCount =
-        MediaQuery.of(context).orientation == Orientation.portrait ? 2 : 3;
+        MediaQuery.of(context).orientation == Orientation.portrait ? 2 : crossAxisCountLandscape;
     var widgetHeight = 220;
+
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -49,8 +51,9 @@ class OverviewPageState extends State<OverviewPage> {
         body: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              Container(
-                  child: Expanded(
+              Expanded(
+                  child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 15),
                 child: MediaQuery.removePadding(
                   context: context,
                   removeTop: true,
@@ -58,11 +61,11 @@ class OverviewPageState extends State<OverviewPage> {
                     shrinkWrap: true,
                     itemCount: widget._room.lights.length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      childAspectRatio:
-                          ((MediaQuery.of(context).size.width / crossAxisCount) /
-                              widgetHeight),
-                    ),
+                        crossAxisCount: crossAxisCount,
+                        childAspectRatio: (MediaQuery.of(context).size.width / crossAxisCount /
+                            widgetHeight),
+                        crossAxisSpacing: 15,
+                        mainAxisSpacing: 15),
                     itemBuilder: (BuildContext context, int index) {
                       return Center(
                           child: LampWidget(
