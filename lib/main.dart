@@ -91,7 +91,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
     return MaterialApp(
       theme: ThemeData(
-          primaryColor: Colors.amber,
+          primaryColor: Colors.amber[300],
           accentColor: Colors.amber[200],
           sliderTheme: Theme.of(context).sliderTheme.copyWith(
                 trackHeight: 22.0,

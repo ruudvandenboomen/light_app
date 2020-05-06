@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:light_app/mqtt/mqtt_wrapper.dart';
 import 'package:light_app/objects/room.dart';
+import 'package:light_app/ui/custom_scroll_behavior.dart';
 import 'package:light_app/ui/lamp_widget.dart';
 
 class OverviewPage extends StatefulWidget {
@@ -30,9 +31,12 @@ class OverviewPageState extends State<OverviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    var crossAxisCountLandscape = MediaQuery.of(context).size.width > 800 ? 4 : 3;
+    var crossAxisCountLandscape =
+        MediaQuery.of(context).size.width > 800 ? 4 : 3;
     var crossAxisCount =
-        MediaQuery.of(context).orientation == Orientation.portrait ? 2 : crossAxisCountLandscape;
+        MediaQuery.of(context).orientation == Orientation.portrait
+            ? 2
+            : crossAxisCountLandscape;
     var widgetHeight = 220;
 
     return Scaffold(
@@ -57,20 +61,24 @@ class OverviewPageState extends State<OverviewPage> {
                 child: MediaQuery.removePadding(
                   context: context,
                   removeTop: true,
-                  child: GridView.builder(
-                    shrinkWrap: true,
-                    itemCount: widget._room.lights.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: crossAxisCount,
-                        childAspectRatio: (MediaQuery.of(context).size.width / crossAxisCount /
-                            widgetHeight),
-                        crossAxisSpacing: 15,
-                        mainAxisSpacing: 15),
-                    itemBuilder: (BuildContext context, int index) {
-                      return Center(
-                          child: LampWidget(
-                              widget._room.lights[index], () => update()));
-                    },
+                  child: ScrollConfiguration(
+                    behavior: CustomScrollBehavior(),
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      itemCount: widget._room.lights.length,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          childAspectRatio: (MediaQuery.of(context).size.width /
+                              crossAxisCount /
+                              widgetHeight),
+                          crossAxisSpacing: 15,
+                          mainAxisSpacing: 15),
+                      itemBuilder: (BuildContext context, int index) {
+                        return Center(
+                            child: LampWidget(
+                                widget._room.lights[index], () => update()));
+                      },
+                    ),
                   ),
                 ),
               )),
