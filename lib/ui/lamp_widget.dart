@@ -82,6 +82,12 @@ class LampWidgetState extends State<LampWidget> {
                         child: CustomSwitch(
                           value: widget._lamp.turnedOn,
                           onChanged: (bool value) {
+                            if(!widget._lamp.turnedOn && value){
+                              widget._lamp.brightness = 0.5;
+                            }
+                            if(!value) {
+                              widget._lamp.brightness = 0;
+                            }
                             widget._lamp.turnedOn = value;
                             widget._sendMqttMessage();
                             this.setState(() {});

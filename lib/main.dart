@@ -5,6 +5,7 @@ import 'package:light_app/objects/light.dart';
 import 'package:light_app/objects/room.dart';
 import 'package:light_app/pages/main_control_page.dart';
 import 'package:light_app/ui/round_slider_track_shape.dart';
+import 'package:light_app/util/secret.dart';
 import 'package:light_app/util/secret_loader.dart';
 
 import 'mqtt/mqtt_wrapper.dart';
@@ -17,7 +18,7 @@ class MyApp extends StatefulWidget {
   createState() => MyAppState();
 }
 
-class MyAppState extends State<MyApp> with WidgetsBindingObserver {
+class MyAppState extends State<MyApp> {
   static List<Light> _lamps = [
     Light("Light 1"),
     Light("Light 2"),
@@ -31,63 +32,25 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
   List<Room> rooms = [
     Room("Tuinhuis", _lamps),
   ];
-
-  MQTTClientWrapper mqttClientWrapper;
-  Temperature currentTemp;
+  Secret secret;
 
   @override
   void initState() {
     super.initState();
     setup();
-    WidgetsBinding.instance.addObserver(this);
   }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    setState(() {
-      if (state == AppLifecycleState.resumed &&
-          mqttClientWrapper.connectionState !=
-              MqttCurrentConnectionState.CONNECTED) setup();
-    });
-  }
-
-  void setup() {
-    SecretLoader(secretPath: "secrets.json").load().then((secret) {
-      mqttClientWrapper = MQTTClientWrapper(
-          secret.mqttHost,
-          'phone_client',
-          1883,
-          () => whatToDoAfterConnect(),
-          (message, topic) => gotMessage(message, topic),
-          username: secret.mqttUsername,
-          password: secret.mqttPassword);
-      mqttClientWrapper.prepareMqttClient();
-      setState(() {});
-    });
-  }
-
-  gotMessage(String message, String topic) {
-    if (topic == MQTTClientWrapper.temperatureTopic) {
-      this.currentTemp = Temperature.fromJson(jsonDecode(message));
-      setState(() {});
-    } else if (topic == MQTTClientWrapper.lightTopic) {
-      rooms[0].fromJson(jsonDecode(message));
-      setState(() {});
+  void setup() async {
+    if (secret == null) {
+      secret = await SecretLoader(secretPath: "secrets.json").load();
     }
+    setState(() {});
   }
-
-  whatToDoAfterConnect() {}
 
   @override
   Widget build(BuildContext context) {
     MainControlPage mainControlPage =
-        MainControlPage(rooms, mqttClientWrapper, currentTemp);
+        MainControlPage(rooms, secret);
 
     return MaterialApp(
       theme: ThemeData(
