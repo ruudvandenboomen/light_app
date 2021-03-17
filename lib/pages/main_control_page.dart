@@ -104,7 +104,7 @@ class MainControlPageState extends State<MainControlPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       body: ScrollConfiguration(
         behavior: CustomScrollBehavior(),
         child: CustomScrollView(
