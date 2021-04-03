@@ -79,3 +79,11 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+  fonts:
+  - family: Ubuntu
+    fonts:
+      - asset: fonts/Ubuntu-R.ttf
+  - family: PTSans
+    fonts:
+      - asset: fonts/PTC55F.ttf
+      

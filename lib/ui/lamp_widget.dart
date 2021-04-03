@@ -35,71 +35,74 @@ class LampWidgetState extends State<LampWidget> {
               borderRadius: BorderRadius.circular(25.0),
             ),
             color: Colors.white,
-            child: Stack(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Positioned(
-                    left: 15,
-                    top: 40,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [],
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
                         Text(widget._lamp.name,
                             style: TextStyle(
                                 color: Colors.black,
-                                fontSize: 24.0,
+                                fontSize: 20.0,
                                 fontWeight: FontWeight.w500)),
-                        Container(
-                          height: 10,
-                        ),
-                        Text(widget._lamp.turnedOn ? "AAN" : "UIT",
-                            style: TextStyle(
+                         CustomSwitch(
+                            value: widget._lamp.turnedOn,
+                            onChanged: (bool value) {
+                              if (!widget._lamp.turnedOn && value) {
+                                widget._lamp.brightness = 0.5;
+                              }
+                              if (!value) {
+                                widget._lamp.brightness = 0;
+                              }
+                              widget._lamp.turnedOn = value;
+                              widget._sendMqttMessage();
+                              this.setState(() {});
+                            },
+                          ),
+                      ]),
+                ),
+                Container(
+                  height: 30,
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(widget._lamp.turnedOn ? "AAN" : "UIT",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 14.0,
+                      )),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: <Widget>[
+                      Text((widget._lamp.brightness * 100).toStringAsFixed(0),
+                          style: TextStyle(
                               color: Colors.black,
-                              fontSize: 14.0,
-                            )),
-                        Row(
-                          children: <Widget>[
-                            Text(
-                                (widget._lamp.brightness * 100)
-                                    .toStringAsFixed(0),
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18.0,
-                                    fontWeight: FontWeight.bold)),
-                            Text("%",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16.0,
-                                )),
-                          ],
-                        )
-                      ],
-                    )),
-                Positioned(
-                    top: 0,
-                    right: 0,
-                    child: RotatedBox(
-                        quarterTurns: 3,
-                        child: CustomSwitch(
-                          value: widget._lamp.turnedOn,
-                          onChanged: (bool value) {
-                            if(!widget._lamp.turnedOn && value){
-                              widget._lamp.brightness = 0.5;
-                            }
-                            if(!value) {
-                              widget._lamp.brightness = 0;
-                            }
-                            widget._lamp.turnedOn = value;
-                            widget._sendMqttMessage();
-                            this.setState(() {});
-                          },
-                        ))),
-                Positioned.fill(
-                    top: 90,
-                    left: 0,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold)),
+                      Text("%",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16.0,
+                          )),
+                    ],
+                  ),
+                ),
+                Container(
+                    padding: EdgeInsets.symmetric(horizontal: 5),
                     child: Slider(
                       divisions: 10,
                       inactiveColor: Colors.grey[100],
-                      activeColor: Colors.amber[getSliderColor()],
+                      activeColor: Colors.green[200],
                       min: 0.0,
                       max: 1.0,
                       onChangeEnd: (brightness) {
@@ -114,7 +117,7 @@ class LampWidgetState extends State<LampWidget> {
                         widget._lamp.brightness = brightness;
                         setState(() {});
                       },
-                    ))
+                    )),
               ],
             )));
   }

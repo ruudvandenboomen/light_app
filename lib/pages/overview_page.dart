@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:light_app/mqtt/mqtt_wrapper.dart';
 import 'package:light_app/objects/room.dart';
 import 'package:light_app/ui/custom_scroll_behavior.dart';
@@ -43,14 +42,9 @@ class OverviewPageState extends State<OverviewPage> {
         appBar: AppBar(
           centerTitle: true,
           title: Text("Tune Lights",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              style: TextStyle(fontSize: 28, fontFamily: "Ubuntu", color: Colors.green[300], fontWeight: FontWeight.bold)),
           elevation: 0,
           backgroundColor: Colors.transparent,
-          leading: IconButton(
-            icon: FaIcon(FontAwesomeIcons.arrowLeft,
-                color: Theme.of(context).accentColor),
-            onPressed: () => Navigator.pop(context),
-          ),
         ),
         body: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

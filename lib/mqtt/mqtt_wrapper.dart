@@ -65,8 +65,7 @@ class MQTTClientWrapper {
       print('MQTTClientWrapper::Mosquitto client connected');
     } else {
       print(
-          'MQTTClientWrapper::ERROR Mosquitto client connection failed - disconnecting, status is ${client
-              .connectionStatus}');
+          'MQTTClientWrapper::ERROR Mosquitto client connection failed - disconnecting, status is ${client.connectionStatus}');
       connectionState = MqttCurrentConnectionState.ERROR_WHEN_CONNECTING;
       client.disconnect();
     }
@@ -78,7 +77,7 @@ class MQTTClientWrapper {
     client.updates.listen((List<MqttReceivedMessage<MqttMessage>> c) {
       final MqttPublishMessage recMess = c[0].payload;
       final String locationJson =
-      MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
+          MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
       print("MQTTClientWrapper::GOT A  MESSAGE $locationJson");
       onMessageReceived(locationJson, c[0].topic);
     });
@@ -110,7 +109,7 @@ class MQTTClientWrapper {
       this._connectClient();
     }
     print('MQTTClientWrapper::Publishing message $message to topic');
-    client.publishMessage(
-        topic, MqttQos.exactlyOnce, builder.payload, retain: true);
+    client.publishMessage(topic, MqttQos.exactlyOnce, builder.payload,
+        retain: true);
   }
 }
