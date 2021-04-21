@@ -53,20 +53,21 @@ class LampWidgetState extends State<LampWidget> {
                                 color: Colors.black,
                                 fontSize: 20.0,
                                 fontWeight: FontWeight.w500)),
-                         CustomSwitch(
-                            value: widget._lamp.turnedOn,
-                            onChanged: (bool value) {
-                              if (!widget._lamp.turnedOn && value) {
-                                widget._lamp.brightness = 0.5;
-                              }
-                              if (!value) {
-                                widget._lamp.brightness = 0;
-                              }
-                              widget._lamp.turnedOn = value;
-                              widget._sendMqttMessage();
-                              this.setState(() {});
-                            },
-                          ),
+                        CustomSwitch(
+                          value: widget._lamp.turnedOn,
+                          backgroundColor: Colors.grey[100],
+                          onChanged: (bool value) {
+                            if (!widget._lamp.turnedOn && value) {
+                              widget._lamp.brightness = 0.5;
+                            }
+                            if (!value) {
+                              widget._lamp.brightness = 0;
+                            }
+                            widget._lamp.turnedOn = value;
+                            widget._sendMqttMessage();
+                            this.setState(() {});
+                          },
+                        ),
                       ]),
                 ),
                 Container(

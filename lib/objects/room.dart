@@ -1,8 +1,12 @@
+import 'package:light_app/objects/preset.dart';
+
 import 'light.dart';
 
 class Room {
   String name;
   List<Light> lights;
+  List<Preset> presets = [];
+  Preset presetInUse;
 
   Room(this.name, this.lights);
 
@@ -29,9 +33,17 @@ class Room {
         this.lights.length;
   }
 
+  activatePreset(Preset preset) {
+    for (int i = 0; i < this.lights.length; i++) {
+      this.lights[i].brightness = preset.lights[i].brightness;
+      this.lights[i].turnedOn = preset.lights[i].turnedOn;
+    }
+    this.presetInUse = preset;
+  }
+
   Map<String, dynamic> toJson() {
     Map<String, dynamic> map = Map();
-    List<double> brightnesses = List();
+    List<double> brightnesses = [];
     for (var i = 0; i < lights.length; i++) {
       Light light = lights[i];
       if (light.turnedOn)

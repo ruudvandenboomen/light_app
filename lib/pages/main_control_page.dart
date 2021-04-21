@@ -2,13 +2,16 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:light_app/mqtt/mqtt_wrapper.dart';
+import 'package:light_app/objects/preset.dart';
 import 'package:light_app/objects/room.dart';
 import 'package:light_app/objects/temperature.dart';
-import 'package:light_app/ui/animated_count.dart';
+import 'package:light_app/pages/preset_page.dart';
 import 'package:light_app/ui/custom_switch.dart';
+import 'package:light_app/ui/main_information_widget.dart';
+import 'package:light_app/ui/preset_list_item.dart';
 import 'package:light_app/ui/round_slider_track_shape.dart';
+import 'package:light_app/util/database_service.dart';
 import 'package:light_app/util/secret.dart';
 import 'package:light_app/util/secret_loader.dart';
 
@@ -33,6 +36,8 @@ class MainControlPageState extends State<MainControlPage>
       currentRoom != null ? currentRoom.getAverageBrightness() : 0.0;
   bool sliderChanged = false;
   PageController pageController = PageController(initialPage: 0);
+  DatabaseService dbService = DatabaseService();
+  Future<List<Preset>> presets;
 
   @override
   void initState() {
@@ -41,6 +46,7 @@ class MainControlPageState extends State<MainControlPage>
     sliderValue = currentRoom.getAverageBrightness();
     setupMqttClientWrapper();
     WidgetsBinding.instance.addObserver(this);
+    presets = dbService.getPresets();
     setState(() {});
   }
 
@@ -58,6 +64,12 @@ class MainControlPageState extends State<MainControlPage>
               MqttCurrentConnectionState.CONNECTED)
         mqttClientWrapper.prepareMqttClient();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    presets = dbService.getPresets();
   }
 
   setupMqttClientWrapper() async {
@@ -93,6 +105,27 @@ class MainControlPageState extends State<MainControlPage>
 
   publishMessage(String message) {
     mqttClientWrapper.publishMessage(message);
+  }
+
+  void _awaitPresetPage(BuildContext context) async {
+    // start the SecondScreen and wait for it to finish with a result
+    Preset newPreset = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PresetPage(
+              Preset("Preset ${currentRoom.presets.length + 1}", currentRoom)),
+        ));
+
+    if (newPreset != null) {
+      await dbService.insertPreset(newPreset);
+      presets = dbService.getPresets();
+      currentRoom.presets.add(newPreset);
+    }
+    setState(() {});
+  }
+
+  void update() {
+    setState(() {});
   }
 
   @override
@@ -136,276 +169,159 @@ class MainControlPageState extends State<MainControlPage>
             print('Page Changes to index $int');
           },
           children: [
-            Stack(
-              children: [
-                Positioned.fill(
-                  child: Container(
-                    color: Colors.green[300],
-                  ),
-                ),
-                Positioned(
-                    top: 200,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                        ),
-                        child: mqttClientWrapper != null
-                            ? Container(
-                                padding: EdgeInsets.symmetric(horizontal: 25),
-                                child: Column(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
-                                  children: <Widget>[
-                                    Container(
-                                      height: 80,
-                                    ),
-                                    Container(height: 20),
-                                    Container(
-                                      child: Column(
-                                        children: <Widget>[
-                                          SliderTheme(
-                                            data: Theme.of(context)
-                                                .sliderTheme
-                                                .copyWith(
-                                                  trackHeight: 30.0,
-                                                  thumbShape:
-                                                      RoundSliderThumbShape(
-                                                          enabledThumbRadius:
-                                                              15),
-                                                  trackShape:
-                                                      RoundSliderTrackShape(),
-                                                  activeTrackColor:
-                                                      Colors.green,
-                                                ),
-                                            child: Slider(
-                                              divisions: 10,
-                                              inactiveColor: Colors.grey[100],
-                                              activeColor:
-                                                  Theme.of(context).accentColor,
-                                              min: 0.0,
-                                              max: 1.0,
-                                              onChangeEnd: (brightness) {
-                                                sliderValue = brightness;
-                                                currentRoom.setLightState(
-                                                    brightness, true);
-                                                publishMessage(jsonEncode(
-                                                    currentRoom.toJson()));
-                                                sliderChanged = true;
-                                              },
-                                              value: getSliderValue(),
-                                              onChanged: (brightness) {
-                                                sliderValue = brightness;
-                                                currentRoom.setLightState(
-                                                    brightness, true);
-                                                sliderChanged = true;
-                                                setState(() {});
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      height: 15,
-                                    ),
-                                    Divider(
-                                      thickness: 1,
-                                    ),
-                                    Container(
-                                      height: 15,
-                                    ),
-                                    Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              "Presets instellen",
-                                              style: TextStyle(
-                                                  fontSize: 24,
-                                                  color: Colors.green[300],
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            IconButton(
-                                              icon: Icon(Icons.add),
-                                              color: Colors.green[300],
-                                              onPressed: () {},
-                                            )
-                                          ],
-                                        ),
-                                        Text(
-                                            "Je hebt nog geen presets ingesteld")
-                                      ],
-                                    )
-                                  ],
-                                ))
-                            : CircularProgressIndicator())),
-                Positioned(
-                  top: 60,
-                  left: 25,
-                  right: 25,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            SingleChildScrollView(
+              child: Stack(
+                children: [
+                  Column(
                     children: [
-                      Text(
-                        "Tuinhuis",
-                        style: TextStyle(
-                            fontFamily: 'Ubuntu',
-                            fontSize: 45,
-                            color: Colors.white),
+                      Container(
+                        height: 200,
+                        width: double.infinity,
+                        color: Colors.green[300],
                       ),
-                      CustomSwitch(
-                        value: currentRoom.lightOn(),
-                        onChanged: (bool value) {
-                          if (value == true) {
-                            double brightness = 0.5;
-                            sliderValue = brightness;
-                            currentRoom.setLightState(brightness, true);
-                          } else {
-                            double brightness = 0;
-                            sliderValue = brightness;
-                            currentRoom.setLightState(brightness, false);
-                          }
-                          publishMessage(jsonEncode(currentRoom.toJson()));
-                          this.setState(() {});
-                        },
-                      )
                     ],
                   ),
-                ),
-                Positioned(
-                  top: 120,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    margin: EdgeInsets.symmetric(horizontal: 25),
-                    height: 160,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.15),
-                          spreadRadius: 5,
-                          blurRadius: 7,
-                          offset: Offset(0, 5),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 25),
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 65,
                         ),
-                      ],
-                    ),
-                    child: Row(
-                      children: <Widget>[
-                        Flexible(
-                          flex: 1,
-                          child: Card(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Tuinhuis",
+                              style: TextStyle(
+                                  fontFamily: 'Ubuntu',
+                                  fontSize: 45,
+                                  color: Colors.white),
                             ),
-                            child: Row(
-                              children: <Widget>[
-                                Flexible(
-                                    flex: 1,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: <Widget>[
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            FaIcon(FontAwesomeIcons.lightbulb,
-                                                color: Theme.of(context)
-                                                    .accentColor),
-                                            Container(
-                                              width: 5,
-                                            ),
-                                            Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                AnimatedCount(
-                                                    duration:
-                                                        Duration(seconds: 1),
-                                                    count: (currentRoom
-                                                                .getAverageBrightness() *
-                                                            100)
-                                                        .toInt(),
-                                                    textStyle: TextStyle(
-                                                        fontSize: 40)),
-                                                Text("%",
-                                                    style: TextStyle(
-                                                        fontSize: 18)),
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    )),
-                                Container(
-                                  margin: EdgeInsets.symmetric(vertical: 20),
-                                  child: VerticalDivider(
-                                    thickness: 1,
-                                  ),
+                            CustomSwitch(
+                              value: currentRoom.lightOn(),
+                              onChanged: (bool value) {
+                                if (value == true) {
+                                  double brightness = 0.5;
+                                  sliderValue = brightness;
+                                  currentRoom.setLightState(brightness, true);
+                                } else {
+                                  double brightness = 0;
+                                  sliderValue = brightness;
+                                  currentRoom.setLightState(brightness, false);
+                                }
+                                publishMessage(
+                                    jsonEncode(currentRoom.toJson()));
+                                this.setState(() {});
+                              },
+                            )
+                          ],
+                        ),
+                        MainInformationWidget(currentRoom, currentTemp),
+                        Container(height: 20),
+                        Container(
+                          child: Column(
+                            children: <Widget>[
+                              SliderTheme(
+                                data: Theme.of(context).sliderTheme.copyWith(
+                                      trackHeight: 30.0,
+                                      thumbShape: RoundSliderThumbShape(
+                                          enabledThumbRadius: 15),
+                                      trackShape: RoundSliderTrackShape(),
+                                      activeTrackColor: Colors.green,
+                                    ),
+                                child: Slider(
+                                  divisions: 10,
+                                  inactiveColor: Colors.grey[100],
+                                  activeColor: Theme.of(context).accentColor,
+                                  min: 0.0,
+                                  max: 1.0,
+                                  onChangeEnd: (brightness) {
+                                    sliderValue = brightness;
+                                    currentRoom.setLightState(brightness, true);
+                                    publishMessage(
+                                        jsonEncode(currentRoom.toJson()));
+                                    sliderChanged = true;
+                                  },
+                                  value: getSliderValue(),
+                                  onChanged: (brightness) {
+                                    sliderValue = brightness;
+                                    currentRoom.setLightState(brightness, true);
+                                    sliderChanged = true;
+                                    setState(() {});
+                                  },
                                 ),
-                                Flexible(
-                                    flex: 1,
-                                    child: currentTemp != null
-                                        ? Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  FaIcon(
-                                                      FontAwesomeIcons
-                                                          .temperatureLow,
-                                                      color: Theme.of(context)
-                                                          .accentColor),
-                                                  Container(
-                                                    width: 5,
-                                                  ),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        "${currentTemp.temperature.toStringAsFixed(0)}",
-                                                        style: TextStyle(
-                                                            fontSize: 40),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                      Text("°C",
-                                                          style: TextStyle(
-                                                              fontSize: 18)),
-                                                    ],
-                                                  )
-                                                ],
-                                              )
-                                            ],
-                                          )
-                                        : Container()),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
+                        Container(
+                          height: 15,
+                        ),
+                        Divider(
+                          thickness: 1,
+                        ),
+                        Container(
+                          height: 10,
+                        ),
+                        Column(children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Presets",
+                                style: TextStyle(
+                                    fontSize: 24,
+                                    color: Colors.green[300],
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              IconButton(
+                                  icon: Icon(Icons.add, size: 28),
+                                  color: Colors.green[300],
+                                  onPressed: () => _awaitPresetPage(context))
+                            ],
+                          ),
+                          FutureBuilder(
+                            builder: (context, presets) {
+                              if (presets.connectionState ==
+                                      ConnectionState.done &&
+                                  presets.hasData) {
+                                if (presets.data.length > 0) {
+                                  currentRoom.presets = presets.data;
+                                  return Container(
+                                    height: (presets.data.length * 70) +
+                                        30.toDouble(),
+                                    child: ListView.builder(
+                                        physics: NeverScrollableScrollPhysics(),
+                                        itemCount: presets.data.length,
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 15),
+                                        itemBuilder: (context, i) {
+                                          return PresetListItem(presets.data[i],
+                                              currentRoom, update);
+                                        }),
+                                  );
+                                } else {
+                                  return Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 10),
+                                      child: Text(
+                                          "Je hebt nog geen presets ingesteld",
+                                          style: TextStyle(fontSize: 16)));
+                                }
+                              }
+                              return Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 10),
+                                  child: CircularProgressIndicator());
+                            },
+                            future: presets,
+                          )
+                        ])
                       ],
                     ),
                   ),
-                )
-              ],
+                ],
+              ),
             ),
             OverviewPage(currentRoom, mqttClientWrapper)
           ]),

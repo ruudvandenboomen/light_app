@@ -3,10 +3,17 @@ import 'package:light_app/objects/light.dart';
 import 'package:light_app/objects/room.dart';
 import 'package:light_app/pages/main_control_page.dart';
 import 'package:light_app/ui/round_slider_track_shape.dart';
+import 'package:light_app/util/database_service.dart';
 import 'package:light_app/util/secret.dart';
 import 'package:light_app/util/secret_loader.dart';
 
-void main() => runApp(MyApp());
+import 'objects/preset.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  DatabaseService();
+  runApp(MyApp());
+}
 
 class MyApp extends StatefulWidget {
   @override
