@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:light_app/objects/room.dart';
+import 'package:light_app/objects/temperature.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
+import 'package:provider/provider.dart';
 
 enum MqttCurrentConnectionState {
   IDLE,
@@ -12,14 +17,17 @@ enum MqttCurrentConnectionState {
 enum MqttSubscriptionState { IDLE, SUBSCRIBED }
 
 class MQTTClientWrapper {
+  static final MQTTClientWrapper instance = MQTTClientWrapper._internal();
+
   static const String lightTopic = "home/summerhouse/lights";
   static const String temperatureTopic = "home/summerhouse/temperature";
 
-  final String _server;
-  final String _clientId;
-  final int _port;
+  String _server;
+  String _clientId;
+  int _port;
   String username;
   String password;
+  BuildContext context;
 
   MqttServerClient client;
 
@@ -27,11 +35,23 @@ class MQTTClientWrapper {
   MqttSubscriptionState subscriptionState = MqttSubscriptionState.IDLE;
 
   VoidCallback onConnectedCallback;
-  Function(String, String) onMessageReceived;
 
-  MQTTClientWrapper(this._server, this._clientId, this._port,
-      this.onConnectedCallback, this.onMessageReceived,
-      {this.username, this.password});
+  factory MQTTClientWrapper(String server, String clientId, int port,
+      VoidCallback onConnectedCallback, BuildContext context,
+      {String username, String password}) {
+    instance._server = server;
+    instance._clientId = clientId;
+    instance._port = port;
+    instance.onConnectedCallback = onConnectedCallback;
+    instance.context = context;
+    instance.username = username;
+    instance.password = password;
+    return instance;
+  }
+
+  MQTTClientWrapper._internal() {
+    prepareMqttClient();
+  }
 
   void prepareMqttClient() async {
     _setupMqttClient();
@@ -79,8 +99,16 @@ class MQTTClientWrapper {
       final String locationJson =
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
       print("MQTTClientWrapper::GOT A  MESSAGE $locationJson");
-      onMessageReceived(locationJson, c[0].topic);
+      this._onMessageReceived(locationJson, c[0].topic);
     });
+  }
+
+  _onMessageReceived(String message, String topic) {
+    if (topic == MQTTClientWrapper.temperatureTopic) {
+      Provider.of<Room>(context, listen: false).temperature = Temperature.fromJson(jsonDecode(message));
+    } else if (topic == MQTTClientWrapper.lightTopic) {
+      Provider.of<Room>(context, listen: false).fromJson(jsonDecode(message));
+    }
   }
 
   void _onConnected() {

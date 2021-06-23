@@ -1,12 +1,14 @@
+import 'package:flutter/material.dart';
 import 'package:light_app/objects/preset.dart';
+import 'package:light_app/objects/temperature.dart';
+import 'package:light_app/objects/light.dart';
 
-import 'light.dart';
-
-class Room {
+class Room extends ChangeNotifier {
   String name;
   List<Light> lights;
   List<Preset> presets = [];
   Preset presetInUse;
+  Temperature _temperature;
 
   Room(this.name, this.lights);
 
@@ -19,6 +21,13 @@ class Room {
       }
     }
     return lightOn;
+  }
+
+  Temperature get temperature => this._temperature;
+
+  set temperature(Temperature temperature) {
+    this._temperature = temperature;
+    notifyListeners();
   }
 
   setLightState(double brightness, bool turnedOn) {
@@ -63,5 +72,6 @@ class Room {
       lights[i].brightness = brightness;
       lights[i].turnedOn = brightness > 0;
     }
+    notifyListeners();
   }
 }

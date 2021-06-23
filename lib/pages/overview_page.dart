@@ -6,25 +6,27 @@ import 'package:light_app/mqtt/mqtt_wrapper.dart';
 import 'package:light_app/objects/room.dart';
 import 'package:light_app/ui/custom_scroll_behavior.dart';
 import 'package:light_app/ui/lamp_widget.dart';
+import 'package:provider/provider.dart';
 
 class OverviewPage extends StatefulWidget {
-  final Room _room;
-  final MQTTClientWrapper _mqttClientWrapper;
 
-  OverviewPage(this._room, this._mqttClientWrapper);
+  OverviewPage();
 
   @override
   State<StatefulWidget> createState() => OverviewPageState();
 }
 
 class OverviewPageState extends State<OverviewPage> {
+  MQTTClientWrapper mqttClientWrapper;
   @override
   void initState() {
     super.initState();
+    mqttClientWrapper = MQTTClientWrapper.instance;
   }
 
   void update() {
-    widget._mqttClientWrapper.publishMessage(jsonEncode(widget._room.toJson()));
+    this.mqttClientWrapper.publishMessage(
+        jsonEncode(Provider.of<Room>(context, listen: false).toJson()));
     setState(() {});
   }
 
@@ -42,7 +44,11 @@ class OverviewPageState extends State<OverviewPage> {
         appBar: AppBar(
           centerTitle: true,
           title: Text("Tune Lights",
-              style: TextStyle(fontSize: 28, fontFamily: "Ubuntu", color: Colors.green[300], fontWeight: FontWeight.bold)),
+              style: TextStyle(
+                  fontSize: 28,
+                  fontFamily: "Ubuntu",
+                  color: Colors.green[300],
+                  fontWeight: FontWeight.bold)),
           elevation: 0,
           backgroundColor: Colors.transparent,
         ),
@@ -56,24 +62,27 @@ class OverviewPageState extends State<OverviewPage> {
                   context: context,
                   removeTop: true,
                   child: ScrollConfiguration(
-                    behavior: CustomScrollBehavior(),
-                    child: GridView.builder(
-                      shrinkWrap: true,
-                      itemCount: widget._room.lights.length,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
-                          childAspectRatio: (MediaQuery.of(context).size.width /
-                              crossAxisCount /
-                              widgetHeight),
-                          crossAxisSpacing: 15,
-                          mainAxisSpacing: 15),
-                      itemBuilder: (BuildContext context, int index) {
-                        return Center(
-                            child: LampWidget(
-                                widget._room.lights[index], () => update()));
-                      },
-                    ),
-                  ),
+                      behavior: CustomScrollBehavior(),
+                      child: Consumer<Room>(builder: (context, room, child) {
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          itemCount: room.lights.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: crossAxisCount,
+                                  childAspectRatio:
+                                      (MediaQuery.of(context).size.width /
+                                          crossAxisCount /
+                                          widgetHeight),
+                                  crossAxisSpacing: 15,
+                                  mainAxisSpacing: 15),
+                          itemBuilder: (BuildContext context, int index) {
+                            return Center(
+                                child: LampWidget(
+                                    room.lights[index], () => update()));
+                          },
+                        );
+                      })),
                 ),
               )),
             ]));

@@ -1,12 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:light_app/objects/room.dart';
 
 class AddRoomPage extends StatefulWidget {
-  final Room _room;
-
-  AddRoomPage(this._room);
+  AddRoomPage();
 
   @override
   State<StatefulWidget> createState() => AddRoomPageState();
@@ -47,9 +44,11 @@ class AddRoomPageState extends State<AddRoomPage> {
               decoration: InputDecoration(hintText: 'Name'),
             ),
             Container(height: 20),
-            FlatButton(
-              padding: EdgeInsets.symmetric(vertical: 15),
-              color: Theme.of(context).primaryColor,
+            TextButton(
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 15),
+                primary: Theme.of(context).primaryColor,
+              ),
               onPressed: () {},
               child: Text("ADD"),
             )

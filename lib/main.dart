@@ -1,18 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:light_app/mqtt/mqtt_wrapper.dart';
 import 'package:light_app/objects/light.dart';
 import 'package:light_app/objects/room.dart';
 import 'package:light_app/pages/main_control_page.dart';
 import 'package:light_app/ui/round_slider_track_shape.dart';
 import 'package:light_app/util/database_service.dart';
-import 'package:light_app/util/secret.dart';
-import 'package:light_app/util/secret_loader.dart';
+import 'package:provider/provider.dart';
 
-import 'objects/preset.dart';
+List<Light> _lamps = [
+  Light("Lamp 1"),
+  Light("Lamp 2"),
+  Light("Lamp 3"),
+  Light("Lamp 4"),
+  Light("Lamp 5"),
+  Light("Lamp 6"),
+  Light("Lamp 7"),
+  Light("Lamp 8"),
+];
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   DatabaseService();
-  runApp(MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (context) => Room("Tuinhuis", _lamps),
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatefulWidget {
@@ -21,38 +33,22 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  static List<Light> _lamps = [
-    Light("Lamp 1"),
-    Light("Lamp 2"),
-    Light("Lamp 3"),
-    Light("Lamp 4"),
-    Light("Lamp 5"),
-    Light("Lamp 6"),
-    Light("Lamp 7"),
-    Light("Lamp 8"),
-  ];
-  List<Room> rooms = [
-    Room("Tuinhuis", _lamps),
-  ];
-  Secret secret;
-
   @override
   void initState() {
     super.initState();
-    setup();
-  }
+    const mqttHost = String.fromEnvironment('MQTT_HOST');
+    const mqttUsername = String.fromEnvironment('MQTT_USERNAME');
+    const mqttPassword = String.fromEnvironment('MQTT_PASSWORD');
 
-  void setup() async {
-    if (secret == null) {
-      secret = await SecretLoader(secretPath: "secrets.json").load();
-    }
-    setState(() {});
+    MQTTClientWrapper mqttClientWrapper = MQTTClientWrapper(
+        mqttHost, 'phone_client', 1883, () => {}, context,
+        username: mqttUsername, password: mqttPassword);
+    mqttClientWrapper.prepareMqttClient();
   }
 
   @override
   Widget build(BuildContext context) {
-    MainControlPage mainControlPage = MainControlPage(rooms, secret);
-
+    MainControlPage mainControlPage = MainControlPage();
     return MaterialApp(
       theme: ThemeData(
           primaryColor: Colors.green[300],
