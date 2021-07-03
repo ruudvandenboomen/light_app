@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:light_app/mqtt/mqtt_wrapper.dart';
 import 'package:light_app/objects/light.dart';
 import 'package:light_app/objects/room.dart';
@@ -36,14 +40,36 @@ class MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    initMqttClient();
+  }
+
+  void initMqttClient() async {
     const mqttHost = String.fromEnvironment('MQTT_HOST');
     const mqttUsername = String.fromEnvironment('MQTT_USERNAME');
     const mqttPassword = String.fromEnvironment('MQTT_PASSWORD');
 
-    MQTTClientWrapper mqttClientWrapper = MQTTClientWrapper(
-        mqttHost, 'phone_client', 1883, () => {}, context,
+    String client = await this._getClientName();
+    MQTTClientWrapper(mqttHost, client, 1883, () => {}, context,
         username: mqttUsername, password: mqttPassword);
-    mqttClientWrapper.prepareMqttClient();
+  }
+
+  Future<String> _getClientName() async {
+    final DeviceInfoPlugin deviceInfoPlugin = new DeviceInfoPlugin();
+    String identifier;
+    try {
+      if (Platform.isAndroid) {
+        var build = await deviceInfoPlugin.androidInfo;
+        //UUID for Android
+        identifier = build.androidId;
+      } else if (Platform.isIOS) {
+        var data = await deviceInfoPlugin.iosInfo;
+        //UUID for iOS
+        identifier = data.identifierForVendor;
+      }
+    } on PlatformException {
+      print('Failed to get platform version');
+    }
+    return "phone_client_$identifier";
   }
 
   @override
@@ -57,6 +83,7 @@ class MyAppState extends State<MyApp> {
                 trackHeight: 22.0,
                 thumbShape: RoundSliderThumbShape(enabledThumbRadius: 11),
                 trackShape: RoundSliderTrackShape(),
+                tickMarkShape: RoundSliderTickMarkShape(tickMarkRadius: 0),
                 activeTrackColor: Colors.green,
               ),
           textTheme: TextTheme(

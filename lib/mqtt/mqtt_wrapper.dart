@@ -46,12 +46,11 @@ class MQTTClientWrapper {
     instance.context = context;
     instance.username = username;
     instance.password = password;
+    instance.prepareMqttClient();
     return instance;
   }
 
-  MQTTClientWrapper._internal() {
-    prepareMqttClient();
-  }
+  MQTTClientWrapper._internal();
 
   void prepareMqttClient() async {
     _setupMqttClient();
