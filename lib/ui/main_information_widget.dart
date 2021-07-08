@@ -55,10 +55,8 @@ class MainInformationWidget extends StatelessWidget {
                                 children: [
                                   AnimatedCount(
                                       duration: Duration(seconds: 1),
-                                      count:
-                                          (room.getAverageBrightness() *
-                                                  100)
-                                              .toInt(),
+                                      count: (room.getAverageBrightness() * 100)
+                                          .toInt(),
                                       textStyle: TextStyle(fontSize: 40)),
                                   Text("%", style: TextStyle(fontSize: 18)),
                                 ],

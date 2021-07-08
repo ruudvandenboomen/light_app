@@ -9,7 +9,6 @@ import 'package:light_app/ui/lamp_widget.dart';
 import 'package:provider/provider.dart';
 
 class OverviewPage extends StatefulWidget {
-
   OverviewPage();
 
   @override

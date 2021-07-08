@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class RoundSliderTrackShape extends SliderTrackShape {
   /// Create a slider track that draws 2 rectangles.
-  const RoundSliderTrackShape({ this.disabledThumbGapWidth = 2.0 });
+  const RoundSliderTrackShape({this.disabledThumbGapWidth = 2.0});
 
   /// Horizontal spacing, or gap, between the disabled thumb and the track.
   ///
@@ -21,7 +21,8 @@ class RoundSliderTrackShape extends SliderTrackShape {
     bool isEnabled,
     bool isDiscrete,
   }) {
-    final double overlayWidth = sliderTheme.overlayShape.getPreferredSize(isEnabled, isDiscrete).width;
+    final double overlayWidth =
+        sliderTheme.overlayShape.getPreferredSize(isEnabled, isDiscrete).width;
     final double trackHeight = sliderTheme.trackHeight;
     assert(overlayWidth >= 0);
     assert(trackHeight >= 0);
@@ -29,14 +30,14 @@ class RoundSliderTrackShape extends SliderTrackShape {
     assert(parentBox.size.height >= trackHeight);
 
     final double trackLeft = offset.dx + overlayWidth / 2;
-    final double trackTop = offset.dy + (parentBox.size.height - trackHeight) / 2;
+    final double trackTop =
+        offset.dy + (parentBox.size.height - trackHeight) / 2;
     // TODO(clocksmith): Although this works for a material, perhaps the default
     // rectangular track should be padded not just by the overlay, but by the
     // max of the thumb and the overlay, in case there is no overlay.
     final double trackWidth = parentBox.size.width - overlayWidth;
     return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
-
 
   @override
   void paint(
@@ -58,10 +59,16 @@ class RoundSliderTrackShape extends SliderTrackShape {
 
     // Assign the track segment paints, which are left: active, right: inactive,
     // but reversed for right to left text.
-    final ColorTween activeTrackColorTween = ColorTween(begin: sliderTheme.disabledActiveTrackColor , end: sliderTheme.activeTrackColor);
-    final ColorTween inactiveTrackColorTween = ColorTween(begin: sliderTheme.disabledInactiveTrackColor , end: sliderTheme.inactiveTrackColor);
-    final Paint activePaint = Paint()..color = activeTrackColorTween.evaluate(enableAnimation);
-    final Paint inactivePaint = Paint()..color = inactiveTrackColorTween.evaluate(enableAnimation);
+    final ColorTween activeTrackColorTween = ColorTween(
+        begin: sliderTheme.disabledActiveTrackColor,
+        end: sliderTheme.activeTrackColor);
+    final ColorTween inactiveTrackColorTween = ColorTween(
+        begin: sliderTheme.disabledInactiveTrackColor,
+        end: sliderTheme.inactiveTrackColor);
+    final Paint activePaint = Paint()
+      ..color = activeTrackColorTween.evaluate(enableAnimation);
+    final Paint inactivePaint = Paint()
+      ..color = inactiveTrackColorTween.evaluate(enableAnimation);
     Paint leftTrackPaint;
     Paint rightTrackPaint;
     switch (textDirection) {
@@ -82,40 +89,55 @@ class RoundSliderTrackShape extends SliderTrackShape {
     // TODO(clocksmith): The new Material spec has a gray circle in place of this gap.
     double horizontalAdjustment = 0.0;
     if (!isEnabled) {
-      final double disabledThumbRadius = sliderTheme.thumbShape.getPreferredSize(false, isDiscrete).width / 2.0;
+      final double disabledThumbRadius =
+          sliderTheme.thumbShape.getPreferredSize(false, isDiscrete).width /
+              2.0;
       final double gap = disabledThumbGapWidth * (1.0 - enableAnimation.value);
       horizontalAdjustment = disabledThumbRadius + gap;
     }
 
     final Rect trackRect = getPreferredRect(
-        parentBox: parentBox,
-        offset: offset,
-        sliderTheme: sliderTheme,
-        isEnabled: isEnabled,
-        isDiscrete: isDiscrete,
+      parentBox: parentBox,
+      offset: offset,
+      sliderTheme: sliderTheme,
+      isEnabled: isEnabled,
+      isDiscrete: isDiscrete,
     );
-    final Rect leftTrackSegment = Rect.fromLTRB(trackRect.left, trackRect.top, thumbCenter.dx - horizontalAdjustment, trackRect.bottom);
+    final Rect leftTrackSegment = Rect.fromLTRB(trackRect.left, trackRect.top,
+        thumbCenter.dx - horizontalAdjustment, trackRect.bottom);
 
     // Left Arc
     context.canvas.drawArc(
-      Rect.fromCircle(center: Offset(trackRect.left, trackRect.top + sliderTheme.trackHeight * 1/2), radius: sliderTheme.trackHeight * 1/2),
-      -pi * 3 / 2, // -270 degrees
-      pi, // 180 degrees
-      false,
-      trackRect.left - thumbCenter.dx == 0.0 ? rightTrackPaint : leftTrackPaint
-    );
+        Rect.fromCircle(
+            center: Offset(trackRect.left,
+                trackRect.top + sliderTheme.trackHeight * 1 / 2),
+            radius: sliderTheme.trackHeight * 1 / 2),
+        -pi * 3 / 2, // -270 degrees
+        pi, // 180 degrees
+        false,
+        trackRect.left - thumbCenter.dx == 0.0
+            ? rightTrackPaint
+            : leftTrackPaint);
 
     // Right Arc
     context.canvas.drawArc(
-      Rect.fromCircle(center: Offset(trackRect.right, trackRect.top + sliderTheme.trackHeight * 1/2), radius: sliderTheme.trackHeight * 1/2),
-      -pi / 2, // -90 degrees
-      pi, // 180 degrees
-      false,
-      trackRect.right - thumbCenter.dx == 0.0 ? leftTrackPaint : rightTrackPaint
-    );
+        Rect.fromCircle(
+            center: Offset(trackRect.right,
+                trackRect.top + sliderTheme.trackHeight * 1 / 2),
+            radius: sliderTheme.trackHeight * 1 / 2),
+        -pi / 2, // -90 degrees
+        pi, // 180 degrees
+        false,
+        trackRect.right - thumbCenter.dx == 0.0
+            ? leftTrackPaint
+            : rightTrackPaint);
 
     context.canvas.drawRect(leftTrackSegment, leftTrackPaint);
-    final Rect rightTrackSegment = Rect.fromLTRB(thumbCenter.dx + horizontalAdjustment, trackRect.top, trackRect.right, trackRect.bottom);
+    final Rect rightTrackSegment = Rect.fromLTRB(
+        thumbCenter.dx + horizontalAdjustment,
+        trackRect.top,
+        trackRect.right,
+        trackRect.bottom);
     context.canvas.drawRect(rightTrackSegment, rightTrackPaint);
   }
 }

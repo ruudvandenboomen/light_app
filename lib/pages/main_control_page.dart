@@ -16,7 +16,6 @@ import 'package:provider/provider.dart';
 import 'overview_page.dart';
 
 class MainControlPage extends StatefulWidget {
-
   MainControlPage();
 
   @override
@@ -268,6 +267,7 @@ class MainControlPageState extends State<MainControlPage>
                                       presets.hasData) {
                                     if (presets.data.length > 0) {
                                       currentRoom.presets = presets.data;
+                                      currentRoom.checkIfPresetIsActive();
                                       return Container(
                                         height: (presets.data.length * 70) +
                                             30.toDouble(),
