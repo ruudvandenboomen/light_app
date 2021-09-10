@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:light_app/objects/preset.dart';
 import 'package:light_app/objects/temperature.dart';
 import 'package:light_app/objects/light.dart';
+import 'package:flutter/foundation.dart';
 
 class Room extends ChangeNotifier {
   String name;
@@ -48,6 +49,17 @@ class Room extends ChangeNotifier {
       this.lights[i].turnedOn = preset.lights[i].turnedOn;
     }
     this.presetInUse = preset;
+  }
+
+  checkIfPresetIsActive() {
+    this.presetInUse = null;
+    this.presets.forEach((preset) {
+      if (listEquals(this.lights.map((light) => light.brightness).toList(),
+          preset.lights.map((light) => light.brightness).toList())) {
+        this.presetInUse = preset;
+        notifyListeners();
+      }
+    });
   }
 
   Map<String, dynamic> toJson() {

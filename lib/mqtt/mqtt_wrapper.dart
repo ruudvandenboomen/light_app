@@ -104,9 +104,11 @@ class MQTTClientWrapper {
 
   _onMessageReceived(String message, String topic) {
     if (topic == MQTTClientWrapper.temperatureTopic) {
-      Provider.of<Room>(context, listen: false).temperature = Temperature.fromJson(jsonDecode(message));
+      Provider.of<Room>(context, listen: false).temperature =
+          Temperature.fromJson(jsonDecode(message));
     } else if (topic == MQTTClientWrapper.lightTopic) {
       Provider.of<Room>(context, listen: false).fromJson(jsonDecode(message));
+      Provider.of<Room>(context, listen: false).checkIfPresetIsActive();
     }
   }
 
