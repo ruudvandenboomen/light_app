@@ -19,8 +19,8 @@ enum MqttSubscriptionState { IDLE, SUBSCRIBED }
 class MQTTClientWrapper {
   static final MQTTClientWrapper instance = MQTTClientWrapper._internal();
 
-  static const String lightTopic = "home/summerhouse/lights";
-  static const String temperatureTopic = "home/summerhouse/temperature";
+  static const String lightTopic = 'home/summerhouse/lights';
+  static const String temperatureTopic = 'home/summerhouse/temperature';
 
   String _server;
   String _clientId;
@@ -61,7 +61,7 @@ class MQTTClientWrapper {
 
   void _setupMqttClient() {
     client =
-        MqttServerClient.withPort(this._server, this._clientId, this._port);
+        MqttServerClient.withPort(_server, _clientId, _port);
     client.logging(on: true);
     client.keepAlivePeriod = 20;
     client.onDisconnected = _onDisconnected;
@@ -71,19 +71,19 @@ class MQTTClientWrapper {
 
   Future<void> _connectClient() async {
     try {
-      print('MQTTClientWrapper::Mosquitto client connecting....');
+      debugPrint('MQTTClientWrapper::Mosquitto client connecting....');
       connectionState = MqttCurrentConnectionState.CONNECTING;
-      await client.connect(this.username, this.password);
+      await client.connect(username, password);
     } on Exception catch (e) {
-      print('MQTTClientWrapper::client exception - $e');
+      debugPrint('MQTTClientWrapper::client exception - $e');
       connectionState = MqttCurrentConnectionState.ERROR_WHEN_CONNECTING;
       client.disconnect();
     }
     if (client.connectionStatus.state == MqttConnectionState.connected) {
       connectionState = MqttCurrentConnectionState.CONNECTED;
-      print('MQTTClientWrapper::Mosquitto client connected');
+      debugPrint('MQTTClientWrapper::Mosquitto client connected');
     } else {
-      print(
+      debugPrint(
           'MQTTClientWrapper::ERROR Mosquitto client connection failed - disconnecting, status is ${client.connectionStatus}');
       connectionState = MqttCurrentConnectionState.ERROR_WHEN_CONNECTING;
       client.disconnect();
@@ -91,18 +91,18 @@ class MQTTClientWrapper {
   }
 
   void _subscribeToTopic(String topicName) {
-    print('MQTTClientWrapper::Subscribing to the $topicName topic');
+    debugPrint('MQTTClientWrapper::Subscribing to the $topicName topic');
     client.subscribe(topicName, MqttQos.atMostOnce);
     client.updates.listen((List<MqttReceivedMessage<MqttMessage>> c) {
       final MqttPublishMessage recMess = c[0].payload;
-      final String locationJson =
+      final locationJson =
           MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
-      print("MQTTClientWrapper::GOT A  MESSAGE $locationJson");
-      this._onMessageReceived(locationJson, c[0].topic);
+      debugPrint('MQTTClientWrapper::GOT A  MESSAGE $locationJson');
+      _onMessageReceived(locationJson, c[0].topic);
     });
   }
 
-  _onMessageReceived(String message, String topic) {
+  void _onMessageReceived(String message, String topic) {
     if (topic == MQTTClientWrapper.temperatureTopic) {
       Provider.of<Room>(context, listen: false).temperature =
           Temperature.fromJson(jsonDecode(message));
@@ -114,30 +114,30 @@ class MQTTClientWrapper {
 
   void _onConnected() {
     connectionState = MqttCurrentConnectionState.CONNECTED;
-    print(
+    debugPrint(
         'MQTTClientWrapper::OnConnected client callback - Client connection was sucessful');
     onConnectedCallback();
   }
 
   void _onDisconnected() {
-    print(
+    debugPrint(
         'MQTTClientWrapper::OnDisconnected client callback - Client disconnection');
     connectionState = MqttCurrentConnectionState.DISCONNECTED;
   }
 
   void _onSubscribed(String topic) {
-    print('MQTTClientWrapper::Subscription confirmed for topic $topic');
+    debugPrint('MQTTClientWrapper::Subscription confirmed for topic $topic');
     subscriptionState = MqttSubscriptionState.SUBSCRIBED;
   }
 
   void publishMessage(String message,
       {String topic = MQTTClientWrapper.lightTopic}) {
-    final MqttClientPayloadBuilder builder = MqttClientPayloadBuilder();
+    final builder = MqttClientPayloadBuilder();
     builder.addString(message);
-    if (this.connectionState == MqttCurrentConnectionState.DISCONNECTED) {
-      this._connectClient();
+    if (connectionState == MqttCurrentConnectionState.DISCONNECTED) {
+      _connectClient();
     }
-    print('MQTTClientWrapper::Publishing message $message to topic');
+    debugPrint('MQTTClientWrapper::Publishing message $message to topic');
     client.publishMessage(topic, MqttQos.exactlyOnce, builder.payload,
         retain: true);
   }

@@ -6,7 +6,7 @@ import 'package:light_app/ui/lamp_widget.dart';
 class PresetPage extends StatefulWidget {
   final Preset _preset;
 
-  PresetPage(this._preset);
+  const PresetPage(this._preset);
 
   @override
   _PresetPageState createState() => _PresetPageState();
@@ -35,15 +35,15 @@ class _PresetPageState extends State<PresetPage> {
     return Scaffold(
         floatingActionButton: FloatingActionButton(
           onPressed: () => Navigator.pop(context, widget._preset),
-          child: Icon(Icons.save),
           foregroundColor: Colors.white,
+          child: Icon(Icons.save),
         ),
         appBar: AppBar(
           centerTitle: true,
-          title: Text("Presets instellen",
+          title: Text('Presets instellen',
               style: TextStyle(
                   fontSize: 28,
-                  fontFamily: "Ubuntu",
+                  fontFamily: 'Ubuntu',
                   color: Colors.green[300],
                   fontWeight: FontWeight.bold)),
           elevation: 0,
@@ -54,7 +54,7 @@ class _PresetPageState extends State<PresetPage> {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  Text("Naam", style: TextStyle(fontSize: 18)),
+                  Text('Naam', style: TextStyle(fontSize: 18)),
                   TextFormField(
                     initialValue: widget._preset.name,
                     onChanged: (text) {

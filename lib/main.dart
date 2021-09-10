@@ -12,28 +12,28 @@ import 'package:light_app/util/database_service.dart';
 import 'package:provider/provider.dart';
 
 List<Light> _lamps = [
-  Light("Lamp 1"),
-  Light("Lamp 2"),
-  Light("Lamp 3"),
-  Light("Lamp 4"),
-  Light("Lamp 5"),
-  Light("Lamp 6"),
-  Light("Lamp 7"),
-  Light("Lamp 8"),
+  Light('Lamp 1'),
+  Light('Lamp 2'),
+  Light('Lamp 3'),
+  Light('Lamp 4'),
+  Light('Lamp 5'),
+  Light('Lamp 6'),
+  Light('Lamp 7'),
+  Light('Lamp 8'),
 ];
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   DatabaseService();
   runApp(ChangeNotifierProvider(
-    create: (context) => Room("Tuinhuis", _lamps),
+    create: (context) => Room('Tuinhuis', _lamps),
     child: MyApp(),
   ));
 }
 
 class MyApp extends StatefulWidget {
   @override
-  createState() => MyAppState();
+  State createState() => MyAppState();
 }
 
 class MyAppState extends State<MyApp> {
@@ -48,13 +48,13 @@ class MyAppState extends State<MyApp> {
     const mqttUsername = String.fromEnvironment('MQTT_USERNAME');
     const mqttPassword = String.fromEnvironment('MQTT_PASSWORD');
 
-    String client = await this._getClientName();
+    var client = await _getClientName();
     MQTTClientWrapper(mqttHost, client, 1883, () => {}, context,
         username: mqttUsername, password: mqttPassword);
   }
 
   Future<String> _getClientName() async {
-    final DeviceInfoPlugin deviceInfoPlugin = new DeviceInfoPlugin();
+    final deviceInfoPlugin = DeviceInfoPlugin();
     String identifier;
     try {
       if (Platform.isAndroid) {
@@ -67,18 +67,17 @@ class MyAppState extends State<MyApp> {
         identifier = data.identifierForVendor;
       }
     } on PlatformException {
-      print('Failed to get platform version');
+      debugPrint('Failed to get platform version');
     }
-    return "phone_client_$identifier";
+    return 'phone_client_$identifier';
   }
 
   @override
   Widget build(BuildContext context) {
-    MainControlPage mainControlPage = MainControlPage();
+    var mainControlPage = MainControlPage();
     return MaterialApp(
       theme: ThemeData(
           primaryColor: Colors.green[300],
-          accentColor: Colors.green[200],
           sliderTheme: Theme.of(context).sliderTheme.copyWith(
                 trackHeight: 22.0,
                 thumbShape: RoundSliderThumbShape(enabledThumbRadius: 11),
@@ -87,13 +86,13 @@ class MyAppState extends State<MyApp> {
                 activeTrackColor: Colors.green,
               ),
           textTheme: TextTheme(
-            headline1: TextStyle(fontFamily: "Ubuntu"),
-            headline2: TextStyle(fontFamily: "Ubuntu"),
-            button: TextStyle(fontFamily: "Ubuntu"),
-            bodyText1: TextStyle(fontFamily: "PTSans"),
-            bodyText2: TextStyle(fontFamily: "PTSans"),
+            headline1: TextStyle(fontFamily: 'Ubuntu'),
+            headline2: TextStyle(fontFamily: 'Ubuntu'),
+            button: TextStyle(fontFamily: 'Ubuntu'),
+            bodyText1: TextStyle(fontFamily: 'PTSans'),
+            bodyText2: TextStyle(fontFamily: 'PTSans'),
           ),
-          iconTheme: IconThemeData(color: Colors.white, size: 28)),
+          iconTheme: IconThemeData(color: Colors.white, size: 28), colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.green[200])),
       debugShowCheckedModeBanner: false,
       home: mainControlPage,
       routes: <String, WidgetBuilder>{

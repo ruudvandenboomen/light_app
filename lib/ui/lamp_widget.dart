@@ -8,7 +8,7 @@ class LampWidget extends StatefulWidget {
   final Light _lamp;
   final VoidCallback _sendMqttMessage;
 
-  LampWidget(this._lamp, this._sendMqttMessage);
+  const LampWidget(this._lamp, this._sendMqttMessage);
 
   @override
   State<StatefulWidget> createState() => LampWidgetState();
@@ -28,7 +28,7 @@ class LampWidgetState extends State<LampWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
         height: 450,
         child: Card(
             shape: RoundedRectangleBorder(
@@ -41,7 +41,7 @@ class LampWidgetState extends State<LampWidget> {
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
-                  children: [],
+                  children: const [],
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 20),
@@ -65,7 +65,7 @@ class LampWidgetState extends State<LampWidget> {
                             }
                             widget._lamp.turnedOn = value;
                             widget._sendMqttMessage();
-                            this.setState(() {});
+                            setState(() {});
                           },
                         ),
                       ]),
@@ -75,7 +75,7 @@ class LampWidgetState extends State<LampWidget> {
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(widget._lamp.turnedOn ? "AAN" : "UIT",
+                  child: Text(widget._lamp.turnedOn ? 'AAN' : 'UIT',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 14.0,
@@ -90,7 +90,7 @@ class LampWidgetState extends State<LampWidget> {
                               color: Colors.black,
                               fontSize: 18.0,
                               fontWeight: FontWeight.bold)),
-                      Text("%",
+                      Text('%',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 16.0,

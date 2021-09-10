@@ -7,7 +7,7 @@ class RoomSelectorWidget extends StatefulWidget {
   final Room _currentRoom;
   final Function _changeCurrentRoom;
 
-  RoomSelectorWidget(this._room, this._currentRoom, this._changeCurrentRoom);
+  const RoomSelectorWidget(this._room, this._currentRoom, this._changeCurrentRoom);
 
   @override
   State<StatefulWidget> createState() => RoomSelectorWidgetState();
@@ -16,7 +16,7 @@ class RoomSelectorWidget extends StatefulWidget {
 class RoomSelectorWidgetState extends State<RoomSelectorWidget> {
   @override
   Widget build(BuildContext context) {
-    bool isSelected = widget._room == widget._currentRoom;
+    var isSelected = widget._room == widget._currentRoom;
     return GestureDetector(
         onTap: () {
           widget._changeCurrentRoom(widget._room);

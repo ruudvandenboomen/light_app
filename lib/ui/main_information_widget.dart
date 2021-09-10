@@ -6,8 +6,8 @@ import 'package:light_app/objects/temperature.dart';
 import 'animated_count.dart';
 
 class MainInformationWidget extends StatelessWidget {
-  Room room;
-  Temperature temperature;
+  final Room room;
+  final Temperature temperature;
 
   MainInformationWidget(this.room, this.temperature);
 
@@ -46,7 +46,7 @@ class MainInformationWidget extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               FaIcon(FontAwesomeIcons.lightbulb,
-                                  color: Theme.of(context).accentColor),
+                                  color: Theme.of(context).colorScheme.secondary),
                               Container(
                                 width: 5,
                               ),
@@ -58,7 +58,7 @@ class MainInformationWidget extends StatelessWidget {
                                       count: (room.getAverageBrightness() * 100)
                                           .toInt(),
                                       textStyle: TextStyle(fontSize: 40)),
-                                  Text("%", style: TextStyle(fontSize: 18)),
+                                  Text('%', style: TextStyle(fontSize: 18)),
                                 ],
                               )
                             ],
@@ -82,7 +82,7 @@ class MainInformationWidget extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     FaIcon(FontAwesomeIcons.temperatureLow,
-                                        color: Theme.of(context).accentColor),
+                                        color: Theme.of(context).colorScheme.secondary),
                                     Container(
                                       width: 5,
                                     ),
@@ -93,11 +93,11 @@ class MainInformationWidget extends StatelessWidget {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          "${temperature.temperature.toStringAsFixed(0)}",
+                                          temperature.temperature.toStringAsFixed(0),
                                           style: TextStyle(fontSize: 40),
                                           textAlign: TextAlign.center,
                                         ),
-                                        Text("°C",
+                                        Text('°C',
                                             style: TextStyle(fontSize: 18)),
                                       ],
                                     )

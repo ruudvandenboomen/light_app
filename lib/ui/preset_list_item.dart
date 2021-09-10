@@ -7,9 +7,9 @@ import 'package:light_app/util/database_service.dart';
 import 'custom_switch.dart';
 
 class PresetListItem extends StatefulWidget {
-  Preset preset;
-  Room room;
-  VoidCallback update;
+  final Preset preset;
+  final Room room;
+  final VoidCallback update;
 
   PresetListItem(this.preset, this.room, this.update);
 
@@ -22,7 +22,7 @@ class _PresetListItemState extends State<PresetListItem> {
 
   void _editPresetPage(BuildContext context) async {
     // start the SecondScreen and wait for it to finish with a result
-    Preset editedPreset = await Navigator.push(
+    var editedPreset = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => PresetPage(widget.preset),
@@ -47,7 +47,7 @@ class _PresetListItemState extends State<PresetListItem> {
             width: 120,
             padding: EdgeInsets.symmetric(horizontal: 10),
             child: Text(
-              "${widget.preset.name}",
+              widget.preset.name,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 18),
             ),

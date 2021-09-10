@@ -5,7 +5,7 @@ class CustomSwitch extends StatefulWidget {
   final ValueChanged<bool> onChanged;
   final Color backgroundColor;
 
-  CustomSwitch(
+  const CustomSwitch(
       {Key key,
       this.value,
       this.onChanged,
@@ -28,7 +28,7 @@ class _CustomSwitchState extends State<CustomSwitch>
   }
 
   @override
-  dispose() {
+  void dispose() {
     _animationController.dispose();
     super.dispose();
   }
@@ -67,7 +67,7 @@ class _CustomSwitchState extends State<CustomSwitch>
                   decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: widget.value
-                          ? Theme.of(context).accentColor
+                          ? Theme.of(context).colorScheme.secondary
                           : Colors.grey[500]),
                 ),
               ),

@@ -7,9 +7,9 @@ class Preset {
   List<Light> lights = [];
 
   Preset(this.name, Room room) {
-    room.lights.forEach((light) {
-      this.lights.add(Light(light.name));
-    });
+    for (var light in room.lights) {
+      lights.add(Light(light.name));
+    }
   }
 
   Preset.fromDB(this.id, this.name, this.lights);

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AddRoomPage extends StatefulWidget {
-  AddRoomPage();
+  const AddRoomPage();
 
   @override
   State<StatefulWidget> createState() => AddRoomPageState();
@@ -24,13 +24,13 @@ class AddRoomPageState extends State<AddRoomPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Add Room",
+        title: Text('Add Room',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
         elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: FaIcon(FontAwesomeIcons.arrowLeft,
-              color: Theme.of(context).accentColor),
+              color: Theme.of(context).colorScheme.secondary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -50,7 +50,7 @@ class AddRoomPageState extends State<AddRoomPage> {
                 primary: Theme.of(context).primaryColor,
               ),
               onPressed: () {},
-              child: Text("ADD"),
+              child: Text('ADD'),
             )
           ],
         ),

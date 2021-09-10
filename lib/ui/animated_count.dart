@@ -4,7 +4,7 @@ class AnimatedCount extends ImplicitlyAnimatedWidget {
   final int count;
   final TextStyle textStyle;
 
-  AnimatedCount(
+  const AnimatedCount(
       {Key key,
       @required this.count,
       @required Duration duration,
@@ -22,13 +22,13 @@ class _AnimatedCountState extends AnimatedWidgetBaseState<AnimatedCount> {
 
   @override
   Widget build(BuildContext context) {
-    return new Text(_count.evaluate(animation).toString(),
+    return Text(_count.evaluate(animation).toString(),
         style: widget.textStyle);
   }
 
   @override
   void forEachTween(TweenVisitor visitor) {
     _count = visitor(
-        _count, widget.count, (dynamic value) => new IntTween(begin: value));
+        _count, widget.count, (dynamic value) => IntTween(begin: value));
   }
 }

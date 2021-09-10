@@ -16,7 +16,7 @@ import 'package:provider/provider.dart';
 import 'overview_page.dart';
 
 class MainControlPage extends StatefulWidget {
-  MainControlPage();
+  const MainControlPage();
 
   @override
   State<StatefulWidget> createState() => MainControlPageState();
@@ -52,8 +52,9 @@ class MainControlPageState extends State<MainControlPage>
     setState(() {
       if (state == AppLifecycleState.resumed &&
           mqttClientWrapper.connectionState !=
-              MqttCurrentConnectionState.CONNECTED)
+              MqttCurrentConnectionState.CONNECTED) {
         mqttClientWrapper.prepareMqttClient();
+      }
     });
   }
 
@@ -63,8 +64,10 @@ class MainControlPageState extends State<MainControlPage>
     presets = dbService.getPresets();
   }
 
-  setBrightness(double brightness) {
-    currentRoom.lights.forEach((lamp) => lamp.brightness = brightness);
+  void setBrightness(double brightness) {
+    for (var lamp in currentRoom.lights) {
+      lamp.brightness = brightness;
+    }
   }
 
   void changeCurrentRoom(Room room) {
@@ -72,17 +75,17 @@ class MainControlPageState extends State<MainControlPage>
     setState(() {});
   }
 
-  publishMessage(String message) {
+  void publishMessage(String message) {
     mqttClientWrapper.publishMessage(message);
   }
 
   void _awaitPresetPage(BuildContext context) async {
     // start the SecondScreen and wait for it to finish with a result
-    Preset newPreset = await Navigator.push(
+    var newPreset = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => PresetPage(
-              Preset("Preset ${currentRoom.presets.length + 1}", currentRoom)),
+              Preset('Preset ${currentRoom.presets.length + 1}', currentRoom)),
         ));
 
     if (newPreset != null) {
@@ -103,7 +106,7 @@ class MainControlPageState extends State<MainControlPage>
       extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: false,
       bottomNavigationBar: BottomAppBar(
-        child: Container(
+        child: SizedBox(
           height: 60,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -134,8 +137,8 @@ class MainControlPageState extends State<MainControlPage>
       ),
       body: PageView(
           controller: pageController,
-          onPageChanged: (int) {
-            print('Page Changes to index $int');
+          onPageChanged: (page) {
+            debugPrint('Page Changes to index $page');
           },
           children: [
             Consumer<Room>(
@@ -163,7 +166,7 @@ class MainControlPageState extends State<MainControlPage>
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  "Tuinhuis",
+                                  'Tuinhuis',
                                   style: TextStyle(
                                       fontFamily: 'Ubuntu',
                                       fontSize: 45,
@@ -173,17 +176,17 @@ class MainControlPageState extends State<MainControlPage>
                                   value: currentRoom.lightOn(),
                                   onChanged: (bool value) {
                                     if (value == true) {
-                                      double brightness = 0.5;
+                                      var brightness = 0.5;
                                       currentRoom.setLightState(
                                           brightness, true);
                                     } else {
-                                      double brightness = 0;
+                                      var brightness = 0;
                                       currentRoom.setLightState(
-                                          brightness, false);
+                                          brightness.toDouble(), false);
                                     }
                                     publishMessage(
                                         jsonEncode(currentRoom.toJson()));
-                                    this.setState(() {});
+                                    setState(() {});
                                   },
                                 )
                               ],
@@ -207,8 +210,9 @@ class MainControlPageState extends State<MainControlPage>
                                     child: Slider(
                                       divisions: 10,
                                       inactiveColor: Colors.grey[100],
-                                      activeColor:
-                                          Theme.of(context).accentColor,
+                                      activeColor: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
                                       min: 0.0,
                                       max: 1.0,
                                       onChangeEnd: (brightness) {
@@ -247,7 +251,7 @@ class MainControlPageState extends State<MainControlPage>
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    "Presets",
+                                    'Presets',
                                     style: TextStyle(
                                         fontSize: 24,
                                         color: Colors.green[300],
@@ -268,7 +272,7 @@ class MainControlPageState extends State<MainControlPage>
                                     if (presets.data.length > 0) {
                                       currentRoom.presets = presets.data;
                                       currentRoom.checkIfPresetIsActive();
-                                      return Container(
+                                      return SizedBox(
                                         height: (presets.data.length * 70) +
                                             30.toDouble(),
                                         child: ListView.builder(
@@ -289,7 +293,7 @@ class MainControlPageState extends State<MainControlPage>
                                           padding: EdgeInsets.symmetric(
                                               vertical: 10),
                                           child: Text(
-                                              "Je hebt nog geen presets ingesteld",
+                                              'Je hebt nog geen presets ingesteld',
                                               style: TextStyle(fontSize: 16)));
                                     }
                                   }

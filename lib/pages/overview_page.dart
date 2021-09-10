@@ -9,7 +9,7 @@ import 'package:light_app/ui/lamp_widget.dart';
 import 'package:provider/provider.dart';
 
 class OverviewPage extends StatefulWidget {
-  OverviewPage();
+  const OverviewPage();
 
   @override
   State<StatefulWidget> createState() => OverviewPageState();
@@ -24,7 +24,7 @@ class OverviewPageState extends State<OverviewPage> {
   }
 
   void update() {
-    this.mqttClientWrapper.publishMessage(
+    mqttClientWrapper.publishMessage(
         jsonEncode(Provider.of<Room>(context, listen: false).toJson()));
     setState(() {});
   }
@@ -42,10 +42,10 @@ class OverviewPageState extends State<OverviewPage> {
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: Text("Tune Lights",
+          title: Text('Tune Lights',
               style: TextStyle(
                   fontSize: 28,
-                  fontFamily: "Ubuntu",
+                  fontFamily: 'Ubuntu',
                   color: Colors.green[300],
                   fontWeight: FontWeight.bold)),
           elevation: 0,

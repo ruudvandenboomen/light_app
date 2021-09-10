@@ -14,8 +14,8 @@ class Room extends ChangeNotifier {
   Room(this.name, this.lights);
 
   bool lightOn() {
-    bool lightOn = false;
-    for (Light light in this.lights) {
+    var lightOn = false;
+    for (var light in lights) {
       if (light.brightness > 0) {
         lightOn = true;
         break;
@@ -24,60 +24,61 @@ class Room extends ChangeNotifier {
     return lightOn;
   }
 
-  Temperature get temperature => this._temperature;
+  Temperature get temperature => _temperature;
 
   set temperature(Temperature temperature) {
-    this._temperature = temperature;
+    _temperature = temperature;
     notifyListeners();
   }
 
-  setLightState(double brightness, bool turnedOn) {
-    for (Light light in this.lights) {
+  void setLightState(double brightness, bool turnedOn) {
+    for (var light in lights) {
       light.turnedOn = turnedOn;
       light.brightness = brightness;
     }
   }
 
   double getAverageBrightness() {
-    return this.lights.map((e) => e.brightness).reduce((a, b) => a + b) /
-        this.lights.length;
+    return lights.map((e) => e.brightness).reduce((a, b) => a + b) /
+        lights.length;
   }
 
-  activatePreset(Preset preset) {
-    for (int i = 0; i < this.lights.length; i++) {
-      this.lights[i].brightness = preset.lights[i].brightness;
-      this.lights[i].turnedOn = preset.lights[i].turnedOn;
+  void activatePreset(Preset preset) {
+    for (var i = 0; i < lights.length; i++) {
+      lights[i].brightness = preset.lights[i].brightness;
+      lights[i].turnedOn = preset.lights[i].turnedOn;
     }
-    this.presetInUse = preset;
+    presetInUse = preset;
   }
 
-  checkIfPresetIsActive() {
-    this.presetInUse = null;
-    this.presets.forEach((preset) {
-      if (listEquals(this.lights.map((light) => light.brightness).toList(),
+  void checkIfPresetIsActive() {
+    presetInUse = null;
+    for (var preset in presets) {
+      if (listEquals(lights.map((light) => light.brightness).toList(),
           preset.lights.map((light) => light.brightness).toList())) {
-        this.presetInUse = preset;
+        presetInUse = preset;
         notifyListeners();
       }
-    });
+    }
   }
 
   Map<String, dynamic> toJson() {
-    Map<String, dynamic> map = Map();
-    List<double> brightnesses = [];
+    var map = <String, dynamic>{};
+    var brightnesses = <double>[];
     for (var i = 0; i < lights.length; i++) {
-      Light light = lights[i];
-      if (light.turnedOn)
+      var light = lights[i];
+      if (light.turnedOn) {
         brightnesses
             .add(double.parse((lights[i].brightness).toStringAsFixed(2)));
-      else
+      } else {
         brightnesses.add(0);
+      }
     }
-    map.putIfAbsent(this.name, () => brightnesses);
+    map.putIfAbsent(name, () => brightnesses);
     return map;
   }
 
-  fromJson(Map<String, dynamic> json) {
+  void fromJson(Map<String, dynamic> json) {
     List<dynamic> brightnesses = json[name];
     for (var i = 0; i < lights.length; i++) {
       double brightness = brightnesses[i].toDouble();
