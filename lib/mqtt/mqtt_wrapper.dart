@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:light_app/objects/room.dart';
 import 'package:light_app/objects/temperature.dart';
 import 'package:mqtt_client/mqtt_client.dart';
-import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:mqtt_client/mqtt_client.dart';
+import 'mqtt_client_factory.dart';
 
 enum MqttCurrentConnectionState {
   IDLE,
@@ -29,7 +31,7 @@ class MQTTClientWrapper {
   String password;
   BuildContext context;
 
-  MqttServerClient client;
+  MqttClient client;
 
   MqttCurrentConnectionState connectionState = MqttCurrentConnectionState.IDLE;
   MqttSubscriptionState subscriptionState = MqttSubscriptionState.IDLE;
@@ -60,8 +62,11 @@ class MQTTClientWrapper {
   }
 
   void _setupMqttClient() {
-    client =
-        MqttServerClient.withPort(_server, _clientId, _port);
+    if (kIsWeb) {
+      client = makeClient('ws://127.0.0.1', _clientId, 8080);
+    } else {
+      client = makeClient(_server, _clientId, _port);
+    }
     client.logging(on: true);
     client.keepAlivePeriod = 20;
     client.onDisconnected = _onDisconnected;

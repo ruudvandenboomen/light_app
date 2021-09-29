@@ -6,10 +6,13 @@ import 'package:flutter/services.dart';
 import 'package:light_app/mqtt/mqtt_wrapper.dart';
 import 'package:light_app/objects/light.dart';
 import 'package:light_app/objects/room.dart';
+import 'package:light_app/pages/onboarding/login_page.dart';
 import 'package:light_app/pages/main_control_page.dart';
 import 'package:light_app/ui/round_slider_track_shape.dart';
 import 'package:light_app/util/database_service.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 List<Light> _lamps = [
   Light('Lamp 1'),
@@ -25,13 +28,20 @@ List<Light> _lamps = [
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   DatabaseService();
+  var sharedPreferences = await SharedPreferences.getInstance();
+  String token = sharedPreferences.get('token');
+  var isLoggedIn = token != null;
   runApp(ChangeNotifierProvider(
     create: (context) => Room('Tuinhuis', _lamps),
-    child: MyApp(),
+    child: MyApp(isLoggedIn),
   ));
 }
 
 class MyApp extends StatefulWidget {
+  final bool isLoggedIn;
+
+  MyApp(this.isLoggedIn);
+
   @override
   State createState() => MyAppState();
 }
@@ -65,11 +75,14 @@ class MyAppState extends State<MyApp> {
         var data = await deviceInfoPlugin.iosInfo;
         //UUID for iOS
         identifier = data.identifierForVendor;
+      } else  {
+        var uuid = Uuid();
+        identifier = uuid.v1();
       }
     } on PlatformException {
       debugPrint('Failed to get platform version');
     }
-    return 'phone_client_$identifier';
+    return 'client_$identifier';
   }
 
   @override
@@ -86,15 +99,18 @@ class MyAppState extends State<MyApp> {
                 activeTrackColor: Colors.green,
               ),
           textTheme: TextTheme(
-            headline1: TextStyle(fontFamily: 'Ubuntu'),
+            headline1: TextStyle(
+                fontFamily: 'Ubuntu', color: Colors.white, fontSize: 32),
             headline2: TextStyle(fontFamily: 'Ubuntu'),
             button: TextStyle(fontFamily: 'Ubuntu'),
             bodyText1: TextStyle(fontFamily: 'PTSans'),
             bodyText2: TextStyle(fontFamily: 'PTSans'),
           ),
-          iconTheme: IconThemeData(color: Colors.white, size: 28), colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.green[200])),
+          iconTheme: IconThemeData(color: Colors.white, size: 28),
+          colorScheme:
+              ColorScheme.fromSwatch().copyWith(secondary: Colors.green[200])),
       debugShowCheckedModeBanner: false,
-      home: mainControlPage,
+      home: widget.isLoggedIn ? MainControlPage() : LoginPage(),
       routes: <String, WidgetBuilder>{
         '/main': (BuildContext context) => mainControlPage,
       },
