@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:light_app/mqtt/mqtt_wrapper.dart';
@@ -58,31 +57,14 @@ class MyAppState extends State<MyApp> {
     const mqttUsername = String.fromEnvironment('MQTT_USERNAME');
     const mqttPassword = String.fromEnvironment('MQTT_PASSWORD');
 
-    var client = await _getClientName();
+    var client = _getClientName();
     MQTTClientWrapper(mqttHost, client, 1883, () => {}, context,
         username: mqttUsername, password: mqttPassword);
   }
 
-  Future<String> _getClientName() async {
-    final deviceInfoPlugin = DeviceInfoPlugin();
-    String identifier;
-    try {
-      if (Platform.isAndroid) {
-        var build = await deviceInfoPlugin.androidInfo;
-        //UUID for Android
-        identifier = build.androidId;
-      } else if (Platform.isIOS) {
-        var data = await deviceInfoPlugin.iosInfo;
-        //UUID for iOS
-        identifier = data.identifierForVendor;
-      } else  {
-        var uuid = Uuid();
-        identifier = uuid.v1();
-      }
-    } on PlatformException {
-      debugPrint('Failed to get platform version');
-    }
-    return 'client_$identifier';
+  String _getClientName() {
+    var uuid = Uuid();
+    return 'client_$uuid';
   }
 
   @override

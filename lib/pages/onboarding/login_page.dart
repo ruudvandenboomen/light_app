@@ -47,8 +47,6 @@ class _LoginPageState extends State<LoginPage> {
             MaterialPageRoute(builder: (context) => MainControlPage()));
       }
       setState(() {});
-      print(login.body);
-      print(login.statusCode);
     }
   }
 
@@ -61,10 +59,9 @@ class _LoginPageState extends State<LoginPage> {
           child: Stack(
         children: [
           SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: 900,
-            child:Container()
-          ),
+              width: MediaQuery.of(context).size.width,
+              height: 900,
+              child: Container()),
           Column(
             children: [
               Container(
@@ -208,7 +205,17 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     SizedBox(
-                      height: 70,
+                        height: 30,
+                        child: Center(
+                            child: errorMessage != null
+                                ? Text(errorMessage,
+                                    style: TextStyle(
+                                        color: Colors.red[300],
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold))
+                                : Container())),
+                    SizedBox(
+                      height: 40,
                     ),
                     Text(
                       'Forgot Password?',
