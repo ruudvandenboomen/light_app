@@ -1,17 +1,16 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:light_app/mqtt/mqtt_wrapper.dart';
 import 'package:light_app/objects/light.dart';
 import 'package:light_app/objects/room.dart';
 import 'package:light_app/pages/onboarding/login_page.dart';
 import 'package:light_app/pages/main_control_page.dart';
 import 'package:light_app/ui/round_slider_track_shape.dart';
-import 'package:light_app/util/database_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'configure_nonweb.dart' if (dart.library.html) 'configure_web.dart';
+import 'util/database_service.dart';
 
 List<Light> _lamps = [
   Light('Lamp 1'),
@@ -25,6 +24,7 @@ List<Light> _lamps = [
 ];
 
 void main() async {
+  configureApp();
   WidgetsFlutterBinding.ensureInitialized();
   DatabaseService();
   var sharedPreferences = await SharedPreferences.getInstance();
@@ -53,12 +53,14 @@ class MyAppState extends State<MyApp> {
   }
 
   void initMqttClient() async {
-    const mqttHost = String.fromEnvironment('MQTT_HOST');
-    const mqttUsername = String.fromEnvironment('MQTT_USERNAME');
-    const mqttPassword = String.fromEnvironment('MQTT_PASSWORD');
+    await dotenv.load(fileName: '.env');
+    var mqttHost = dotenv.env['MQTT_HOST'];
+    var mqttUsername = dotenv.env['MQTT_USERNAME'];
+    var mqttPassword = dotenv.env['MQTT_PASSWORD'];
+    var mqttPort = int.parse(dotenv.env['MQTT_PORT']);
 
     var client = _getClientName();
-    MQTTClientWrapper(mqttHost, client, 1883, () => {}, context,
+    MQTTClientWrapper(mqttHost, client, mqttPort, () => {}, context,
         username: mqttUsername, password: mqttPassword);
   }
 
@@ -93,9 +95,6 @@ class MyAppState extends State<MyApp> {
               ColorScheme.fromSwatch().copyWith(secondary: Colors.green[200])),
       debugShowCheckedModeBanner: false,
       home: widget.isLoggedIn ? MainControlPage() : LoginPage(),
-      routes: <String, WidgetBuilder>{
-        '/main': (BuildContext context) => mainControlPage,
-      },
     );
   }
 }

@@ -208,7 +208,7 @@ class MainControlPageState extends State<MainControlPage>
                                           activeTrackColor: Colors.green,
                                         ),
                                     child: Slider(
-                                      divisions: 10,
+                                      divisions: 20,
                                       inactiveColor: Colors.grey[100],
                                       activeColor: Theme.of(context)
                                           .colorScheme

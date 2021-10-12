@@ -5,8 +5,6 @@ import 'package:light_app/objects/room.dart';
 import 'package:light_app/objects/temperature.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:mqtt_client/mqtt_client.dart';
 import 'mqtt_client_factory.dart';
 
 enum MqttCurrentConnectionState {
@@ -62,11 +60,7 @@ class MQTTClientWrapper {
   }
 
   void _setupMqttClient() {
-    if (kIsWeb) {
-      client = makeClient('ws://127.0.0.1', _clientId, 8080);
-    } else {
-      client = makeClient(_server, _clientId, _port);
-    }
+    client = makeClient(_server, _clientId, _port);
     client.logging(on: true);
     client.keepAlivePeriod = 20;
     client.onDisconnected = _onDisconnected;

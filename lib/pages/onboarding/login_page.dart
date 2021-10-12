@@ -15,7 +15,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  var _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   String errorMessage;
@@ -34,6 +34,7 @@ class _LoginPageState extends State<LoginPage> {
       print('${emailController.text}, ${passwordController.text}');
       var login = await AuthService.login(
           emailController.text, passwordController.text);
+
       Map resp = jsonDecode(login.body);
       if (login.statusCode == HttpStatus.unauthorized) {
         if (resp.containsKey('message')) {
@@ -59,9 +60,15 @@ class _LoginPageState extends State<LoginPage> {
           child: Stack(
         children: [
           SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: 900,
-              child: Container()),
+            width: MediaQuery.of(context).size.width,
+            height: 900,
+            child: ClipPath(
+              clipper: GreenClipper(),
+              child: Container(
+                color: Color.fromRGBO(129, 199, 132, 1),
+              ),
+            ),
+          ),
           Column(
             children: [
               Container(
@@ -258,6 +265,6 @@ class GreenClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(CustomClipper oldClipper) {
-    return null;
+    return true;
   }
 }
