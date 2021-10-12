@@ -22,8 +22,7 @@ class _AnimatedCountState extends AnimatedWidgetBaseState<AnimatedCount> {
 
   @override
   Widget build(BuildContext context) {
-    return Text(_count.evaluate(animation).toString(),
-        style: widget.textStyle);
+    return Text(_count.evaluate(animation).toString(), style: widget.textStyle);
   }
 
   @override

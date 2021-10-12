@@ -7,7 +7,8 @@ class RoomSelectorWidget extends StatefulWidget {
   final Room _currentRoom;
   final Function _changeCurrentRoom;
 
-  const RoomSelectorWidget(this._room, this._currentRoom, this._changeCurrentRoom);
+  const RoomSelectorWidget(
+      this._room, this._currentRoom, this._changeCurrentRoom);
 
   @override
   State<StatefulWidget> createState() => RoomSelectorWidgetState();

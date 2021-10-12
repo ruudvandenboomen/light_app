@@ -46,7 +46,8 @@ class MainInformationWidget extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               FaIcon(FontAwesomeIcons.lightbulb,
-                                  color: Theme.of(context).colorScheme.secondary),
+                                  color:
+                                      Theme.of(context).colorScheme.secondary),
                               Container(
                                 width: 5,
                               ),
@@ -82,7 +83,9 @@ class MainInformationWidget extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     FaIcon(FontAwesomeIcons.temperatureLow,
-                                        color: Theme.of(context).colorScheme.secondary),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary),
                                     Container(
                                       width: 5,
                                     ),
@@ -93,7 +96,8 @@ class MainInformationWidget extends StatelessWidget {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          temperature.temperature.toStringAsFixed(0),
+                                          temperature.temperature
+                                              .toStringAsFixed(0),
                                           style: TextStyle(fontSize: 40),
                                           textAlign: TextAlign.center,
                                         ),

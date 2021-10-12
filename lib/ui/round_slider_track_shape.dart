@@ -30,8 +30,7 @@ class RoundSliderTrackShape extends SliderTrackShape {
     assert(parentBox.size.height >= trackHeight);
 
     final trackLeft = offset.dx + overlayWidth / 2;
-    final trackTop =
-        offset.dy + (parentBox.size.height - trackHeight) / 2;
+    final trackTop = offset.dy + (parentBox.size.height - trackHeight) / 2;
     // TODO(clocksmith): Although this works for a material, perhaps the default
     // rectangular track should be padded not just by the overlay, but by the
     // max of the thumb and the overlay, in case there is no overlay.
